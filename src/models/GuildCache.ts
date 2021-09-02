@@ -4,15 +4,17 @@ import ChannelCleaner from "../utilities/ChannelCleaner"
 import equal from "deep-equal"
 import Poll from "./Poll"
 import FirestoreParser from "../utilities/FirestoreParser"
+import Response from "./Response"
 
 export default class GuildCache {
 	public bot: Client
 	public guild: Guild
-	private ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>
+	public ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>
 	private document: Document = Document.getEmpty()
 
-	private polls: Poll[] = []
-	private draft: Poll | undefined
+	public polls: Poll[] = []
+	public responses: Response[] = []
+	public draft: Poll | undefined
 
 	public constructor(
 		bot: Client,
@@ -33,6 +35,10 @@ export default class GuildCache {
 			const converter = new FirestoreParser(this, snaps.docs)
 			this.polls = converter.getPolls()
 			this.draft = converter.getDraft()
+		})
+		this.ref.collection("responses").onSnapshot(snaps => {
+			const converter = new FirestoreParser(this, snaps.docs)
+			this.responses = converter.getResponses()
 		})
 	}
 
@@ -81,18 +87,18 @@ export default class GuildCache {
 			}
 		}
 
-		const paylaods = this.polls
+		const payloads = this.polls
 			.sort((a, b) => b.value.date - a.value.date)
-			.map(poll => poll.getMessagePayload())
+			.map(poll => poll.getMessagePayload(this))
 
 		const pollMessageIds = this.getPollMessageIds()
 
-		if (paylaods.length === pollMessageIds.length) {
+		if (payloads.length === pollMessageIds.length) {
 			for (let i = 0, il = pollMessageIds.length; i < il; i++) {
 				const messageId = pollMessageIds[i]
-				const payload = paylaods[i]
+				const payload = payloads[i]
 				const message = messages.get(messageId)!
-				message.edit(payload).then()
+				message.edit(await payload).then()
 			}
 		}
 		else {

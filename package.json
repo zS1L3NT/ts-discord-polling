@@ -16,7 +16,8 @@
 		"deep-equal": "^2.0.5",
 		"discord-api-types": "^0.22.0",
 		"discord.js": "^13.1.0",
-		"firebase-admin": "^9.11.0"
+		"firebase-admin": "^9.11.0",
+		"quickchart-js": "^1.4.1"
 	},
 	"devDependencies": {
 		"@types/deep-equal": "^1.0.1",
