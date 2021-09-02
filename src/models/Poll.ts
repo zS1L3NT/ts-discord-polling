@@ -11,6 +11,7 @@ export interface iPoll {
 	description: string
 	choices: { [key: string]: string }
 	options: {
+		is_closed: boolean
 		is_anonymous: boolean
 		is_multi_choice: boolean
 		is_quiz: boolean
@@ -40,15 +41,12 @@ export default class Poll {
 			description: "",
 			choices: {},
 			options: {
+				is_closed: false,
 				is_anonymous: false,
 				is_multi_choice: false,
 				is_quiz: false
 			}
 		})
-	}
-
-	public getKeys() {
-		return Object.keys(this.value.choices).sort()
 	}
 
 	public static getDraftDisplay(poll: Poll | undefined, cache: GuildCache): MessageEmbed {
@@ -81,14 +79,21 @@ export default class Poll {
 
 			const date = new DateFunctions(poll.value.date)
 			embed.addField("ID", poll.value.id)
-			embed.addField("Closing date", date.getDueDate())
-			embed.addField("Closing in", date.getDueIn())
+
+			if (!poll.value.options.is_closed) {
+				embed.addField("Closing date", date.getDueDate())
+				embed.addField("Closing in", date.getDueIn())
+			}
 		}
 		else {
 			embed.setTitle("No draft")
 		}
 
 		return embed
+	}
+
+	public getKeys() {
+		return Object.keys(this.value.choices).sort()
 	}
 
 	public getMessagePayload(cache: GuildCache): MessageOptions {
@@ -128,33 +133,44 @@ export default class Poll {
 				Poll.getDraftDisplay(this, cache)
 					.setImage(responses.length > 0 ? chart.getUrl() : "")
 			],
-			components: [
-				new MessageActionRow()
-					.addComponents(
-						this.getKeys().map(key => new MessageButton()
-							.setLabel(key)
-							.setStyle("PRIMARY")
-							.setCustomId(`${this.value.id}-${key}`))
-					),
-				new MessageActionRow()
-					.addComponents(
-						new MessageButton()
-							.setLabel("Close poll")
-							.setStyle("DANGER")
-							.setCustomId("close-poll")
-							.setEmoji("❎"),
-						new MessageButton()
-							.setLabel("Undo my vote")
-							.setStyle("SECONDARY")
-							.setCustomId("undo-vote")
-							.setEmoji("↩️"),
-						new MessageButton()
-							.setLabel("Show my vote")
-							.setStyle("SUCCESS")
-							.setCustomId("show-vote")
-							.setEmoji("👁️")
-					)
-			]
+			components: !this.value.options.is_closed
+				? [
+					new MessageActionRow()
+						.addComponents(
+							this.getKeys().map(key => new MessageButton()
+								.setLabel(key)
+								.setStyle("PRIMARY")
+								.setCustomId(`${this.value.id}-${key}`))
+						),
+					new MessageActionRow()
+						.addComponents(
+							new MessageButton()
+								.setLabel("Close poll")
+								.setStyle("DANGER")
+								.setCustomId("close-poll")
+								.setEmoji("❎"),
+							new MessageButton()
+								.setLabel("Undo my vote")
+								.setStyle("SECONDARY")
+								.setCustomId("undo-vote")
+								.setEmoji("↩️"),
+							new MessageButton()
+								.setLabel("Show my vote")
+								.setStyle("SUCCESS")
+								.setCustomId("show-vote")
+								.setEmoji("👁️")
+						)
+				]
+				: [
+					new MessageActionRow()
+						.addComponents(
+							new MessageButton()
+								.setLabel("Delete poll")
+								.setStyle("DANGER")
+								.setCustomId("delete-poll")
+								.setEmoji("🗑️")
+						)
+				]
 		}
 	}
 }
