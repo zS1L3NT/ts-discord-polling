@@ -25,7 +25,7 @@ module.exports = {
 
 		helper.respond({
 			content: `✅ Created draft`,
-			embeds: [await Poll.getDraftDisplay(helper.cache.draft, helper.cache.guild.members)]
+			embeds: [Poll.getDraftDisplay(helper.cache.draft, helper.cache)]
 		})
 	}
 } as iInteractionSubcommandFile

@@ -98,7 +98,7 @@ export default class GuildCache {
 				const messageId = pollMessageIds[i]
 				const payload = payloads[i]
 				const message = messages.get(messageId)!
-				message.edit(await payload).then()
+				message.edit(payload).then()
 			}
 		}
 		else {
@@ -127,5 +127,10 @@ export default class GuildCache {
 	public async removePoll(id: string) {
 		this.polls = this.polls.filter(poll => poll.value.id !== id)
 		await this.ref.collection("polls").doc(id).delete()
+	}
+
+	public async setResponse(response: Response) {
+		this.responses.push(response)
+		await this.ref.collection("responses").doc(response.value.id).set(response.value)
 	}
 }

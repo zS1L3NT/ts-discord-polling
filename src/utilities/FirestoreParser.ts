@@ -1,5 +1,6 @@
 import GuildCache from "../models/GuildCache"
 import Poll, { iPoll } from "../models/Poll"
+import Response, { iResponse } from "../models/Response"
 
 export default class FirestoreParser {
 	private cache: GuildCache
@@ -17,6 +18,11 @@ export default class FirestoreParser {
 		return this.docs
 			.filter(doc => doc.id !== "draft")
 			.map(doc => new Poll(doc.data() as iPoll))
+	}
+
+	public getResponses(): Response[] {
+		return this.docs
+			.map(doc => new Response(doc.data() as iResponse))
 	}
 
 	public getDraft(): Poll | undefined {

@@ -1,4 +1,4 @@
-import { GuildMemberManager, MessageActionRow, MessageButton, MessageEmbed, MessageOptions } from "discord.js"
+import { MessageActionRow, MessageButton, MessageEmbed, MessageOptions } from "discord.js"
 import DateFunctions from "../utilities/DateFunctions"
 import QuickChart from "quickchart-js"
 import GuildCache from "./GuildCache"
@@ -9,10 +9,22 @@ export interface iPoll {
 	author_id: string
 	title: string
 	description: string
-	options: { [key: string]: string }
+	choices: { [key: string]: string }
+	options: {
+		is_anonymous: boolean
+		is_multi_choice: boolean
+		is_quiz: boolean
+	}
 }
 
 export default class Poll {
+	public static emojis = [
+		"1️⃣",
+		"2️⃣",
+		"3️⃣",
+		"4️⃣",
+		"5️⃣"
+	]
 	public value: iPoll
 
 	public constructor(value: iPoll) {
@@ -26,43 +38,49 @@ export default class Poll {
 			author_id: "",
 			title: "",
 			description: "",
-			options: {}
+			choices: {},
+			options: {
+				is_anonymous: false,
+				is_multi_choice: false,
+				is_quiz: false
+			}
 		})
 	}
 
-	public static async getDraftDisplay(poll: Poll | undefined, members: GuildMemberManager): Promise<MessageEmbed> {
+	public getKeys() {
+		return Object.keys(this.value.choices).sort()
+	}
+
+	public static getDraftDisplay(poll: Poll | undefined, cache: GuildCache): MessageEmbed {
 		const embed = new MessageEmbed()
-		const emojis = [
-			"1️⃣",
-			"2️⃣",
-			"3️⃣",
-			"4️⃣",
-			"5️⃣"
-		]
 
 		if (poll) {
-			const member = await members.fetch(poll.value.author_id)
+			const member = cache.guild.members.cache.get(poll.value.author_id)
 			if (member) {
 				embed.setAuthor(member.displayName, member.user.displayAvatarURL())
 			}
+			else {
+				cache.guild.members.fetch(poll.value.author_id).then()
+			}
 
 			embed.setTitle(`__${poll.value.title}__`)
-			embed.addField(poll.value.description, "\u200B")
+			embed.setDescription(`**${poll.value.description}**\n\u200B`)
 
 			let i = 0
-			for (const key of Object.keys(poll.value.options).sort()) {
-				const value = poll.value.options[key]
+			for (const key of poll.getKeys()) {
+				const value = poll.value.choices[key]
 				i++
 
-				if (i === Object.keys(poll.value.options).length) {
-					embed.addField(`${emojis[i - 1]} ${key}`, value + "\n\u200B")
+				if (i === poll.getKeys().length) {
+					embed.addField(`${Poll.emojis[i - 1]} ${key}`, value + "\n\u200B")
 				}
 				else {
-					embed.addField(`${emojis[i - 1]} ${key}`, value)
+					embed.addField(`${Poll.emojis[i - 1]} ${key}`, value)
 				}
 			}
 
 			const date = new DateFunctions(poll.value.date)
+			embed.addField("ID", poll.value.id)
 			embed.addField("Closing date", date.getDueDate())
 			embed.addField("Closing in", date.getDueIn())
 		}
@@ -73,17 +91,18 @@ export default class Poll {
 		return embed
 	}
 
-	public async getMessagePayload(cache: GuildCache): Promise<MessageOptions> {
+	public getMessagePayload(cache: GuildCache): MessageOptions {
+		const responses = cache.responses.filter(res => res.value.poll_id === this.value.id)
 		const chart = new QuickChart()
-		const keys = Object.keys(this.value.options).sort()
+
 		chart.setBackgroundColor("#2F3136")
 		chart.setConfig({
 			type: "outlabeledPie",
 			data: {
-				labels: keys,
+				labels: this.getKeys(),
 				datasets: [{
 					backgroundColor: ["#FF3784", "#36A2EB", "#4BC0C0", "#F77825", "#9966FF"],
-					data: [24, 2, 1, 25, 48]
+					data: this.getKeys().map(key => responses.filter(res => res.value.keys.includes(key)).length)
 				}]
 			},
 			options: {
@@ -106,13 +125,13 @@ export default class Poll {
 		return {
 			content: "\u200B",
 			embeds: [
-				(await Poll.getDraftDisplay(this, cache.guild.members))
-					.setImage(chart.getUrl())
+				Poll.getDraftDisplay(this, cache)
+					.setImage(responses.length > 0 ? chart.getUrl() : "")
 			],
 			components: [
 				new MessageActionRow()
 					.addComponents(
-						keys.map(key => new MessageButton()
+						this.getKeys().map(key => new MessageButton()
 							.setLabel(key)
 							.setStyle("PRIMARY")
 							.setCustomId(`${this.value.id}-${key}`))

@@ -8,6 +8,7 @@ import MenuHelper from "./MenuHelper"
 import fs from "fs"
 import path from "path"
 import SlashCommandDeployer from "./SlashCommandDeployer"
+import DynamicButton from "./DynamicButton"
 
 export default class BotSetupHelper {
 	public cache: BotCache
@@ -87,11 +88,15 @@ export default class BotSetupHelper {
 			if (interaction.isButton()) {
 				await interaction.deferReply({ ephemeral: true })
 				const buttonFile = this.buttonFiles.get(interaction.customId)
-				if (!buttonFile) return
-
 				const helper = new ButtonHelper(cache, interaction)
+
 				try {
-					await buttonFile.execute(helper)
+					if (!buttonFile) {
+						await new DynamicButton(helper).run()
+					}
+					else {
+						await buttonFile.execute(helper)
+					}
 				} catch (error) {
 					console.error(error)
 					await interaction.followUp(
