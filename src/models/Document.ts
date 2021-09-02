@@ -1,4 +1,6 @@
 export interface iDocument {
+	poll_channel_id: string
+	poll_message_ids: string[]
 }
 
 export default class Document {
@@ -10,6 +12,8 @@ export default class Document {
 
 	public static getEmpty():Document {
 		return new Document({
+			poll_channel_id: "",
+			poll_message_ids: []
 		})
 	}
 }
