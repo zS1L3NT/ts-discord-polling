@@ -24,6 +24,10 @@ module.exports = {
 			return helper.respond("❌ No draft to edit")
 		}
 
+		if (Object.keys(draft.value.choices).length === 5) {
+			return helper.respond("❌ Cannot set more than 5 choices")
+		}
+
 		const key = helper.string("key", true)!
 		const value = helper.string("value") ?? ""
 		draft.value.choices[key] = value

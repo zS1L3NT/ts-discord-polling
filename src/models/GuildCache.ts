@@ -4,7 +4,7 @@ import ChannelCleaner from "../utilities/ChannelCleaner"
 import equal from "deep-equal"
 import Poll from "./Poll"
 import FirestoreParser from "../utilities/FirestoreParser"
-import Response from "./Response"
+import Vote from "./Vote"
 
 export default class GuildCache {
 	public bot: Client
@@ -13,7 +13,7 @@ export default class GuildCache {
 	private document: Document = Document.getEmpty()
 
 	public polls: Poll[] = []
-	public responses: Response[] = []
+	public votes: Vote[] = []
 	public draft: Poll | undefined
 
 	public constructor(
@@ -36,9 +36,9 @@ export default class GuildCache {
 			this.polls = converter.getPolls()
 			this.draft = converter.getDraft()
 		})
-		this.ref.collection("responses").onSnapshot(snaps => {
+		this.ref.collection("votes").onSnapshot(snaps => {
 			const converter = new FirestoreParser(this, snaps.docs)
-			this.responses = converter.getResponses()
+			this.votes = converter.getVotes()
 		})
 	}
 
@@ -133,8 +133,8 @@ export default class GuildCache {
 		await this.ref.collection("polls").doc(id).delete()
 	}
 
-	public async setResponse(response: Response) {
-		this.responses.push(response)
-		await this.ref.collection("responses").doc(response.value.id).set(response.value)
+	public async setVote(vote: Vote) {
+		this.votes.push(vote)
+		await this.ref.collection("votes").doc(vote.value.id).set(vote.value)
 	}
 }

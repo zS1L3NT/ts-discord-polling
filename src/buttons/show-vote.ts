@@ -9,7 +9,7 @@ module.exports = {
 		const poll = helper.cache.polls.find(poll => poll.value.id === poll_id)!
 		const keys = poll.getKeys()
 
-		const response = helper.cache.responses.find(res =>
+		const vote = helper.cache.votes.find(res =>
 			res.value.poll_id === poll_id &&
 			res.value.user_id === helper.interaction.user.id
 		)
@@ -18,19 +18,19 @@ module.exports = {
 		const user = helper.interaction.user
 
 		const embed = new MessageEmbed()
-			.setAuthor(`${member.displayName}'s response`, user.displayAvatarURL())
+			.setAuthor(`${member.displayName}'s vote`, user.displayAvatarURL())
 			.setTitle(`__${poll.value.title}__`)
 			.setDescription(`**${poll.value.description}**\n\u200B`)
 
-		if (response) {
+		if (vote) {
 			for (const key of poll.getKeys()) {
-				if (response.value.keys.includes(key)) {
+				if (vote.value.keys.includes(key)) {
 					embed.addField(`${Poll.emojis[keys.indexOf(key)]} ${key}`, poll.value.choices[key] ?? "*No description*")
 				}
 			}
 		}
 		else {
-			embed.description += "\nNo response"
+			embed.description += "\nNo vote"
 		}
 
 		helper.respond({

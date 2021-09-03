@@ -5,7 +5,13 @@ import Poll from "../../models/Poll"
 module.exports = {
 	data: new SlashCommandSubcommandBuilder()
 		.setName("description")
-		.setDescription("Change the description of the existing draft"),
+		.setDescription("Change the description of the existing draft")
+		.addStringOption(option =>
+			option
+				.setName("description")
+				.setDescription("Description of the draft")
+				.setRequired(true)
+		),
 	execute: async helper => {
 		const draft = helper.cache.draft
 		if (!draft) {

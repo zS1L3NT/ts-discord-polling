@@ -13,13 +13,13 @@ module.exports = {
 			const serverDoc = helper.cache.ref
 			const promises: Promise<any>[] = []
 
-			const snaps = await serverDoc.collection("responses").where("poll_id", "==", poll_id).get()
+			const snaps = await serverDoc.collection("votes").where("poll_id", "==", poll_id).get()
 
 			promises.push(message.delete())
 			promises.push(serverDoc.collection("polls").doc(poll_id).delete())
 			promises.push(serverDoc.update({ poll_message_ids: admin.firestore.FieldValue.arrayRemove(message.id) }))
 			for (const snap of snaps.docs) {
-				promises.push(serverDoc.collection("responses").doc(snap.id).delete())
+				promises.push(serverDoc.collection("votes").doc(snap.id).delete())
 			}
 
 			await Promise.allSettled(promises)

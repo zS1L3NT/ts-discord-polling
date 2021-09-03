@@ -144,7 +144,7 @@ export default class Poll {
 					embed.addField("\u200B", "**Closed**")
 				}
 
-				const responses = cache.responses.filter(res => res.value.poll_id === this.value.id)
+				const votes = cache.votes.filter(res => res.value.poll_id === this.value.id)
 				const chart = new QuickChart()
 				chart.setBackgroundColor("#2F3136")
 				chart.setConfig({
@@ -153,7 +153,7 @@ export default class Poll {
 						labels: this.getKeys(),
 						datasets: [{
 							backgroundColor: ["#FF3784", "#36A2EB", "#4BC0C0", "#F77825", "#9966FF"],
-							data: this.getKeys().map(key => responses.filter(res => res.value.keys.includes(key)).length)
+							data: this.getKeys().map(key => votes.filter(res => res.value.keys.includes(key)).length)
 						}]
 					},
 					options: {
@@ -172,7 +172,7 @@ export default class Poll {
 						}
 					}
 				})
-				embed.setImage(responses.length > 0 ? chart.getUrl() : "")
+				embed.setImage(votes.length > 0 ? chart.getUrl() : "")
 
 				return embed
 			})()],

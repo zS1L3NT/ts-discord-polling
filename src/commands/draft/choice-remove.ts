@@ -28,7 +28,7 @@ module.exports = {
 				}
 			}, { merge: true })
 
-			helper.respond("✅ Choice added")
+			helper.respond("✅ Choice removed")
 		} else {
 			helper.respond("❌ No choice with that key")
 		}

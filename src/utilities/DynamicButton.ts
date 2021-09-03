@@ -1,6 +1,6 @@
 import admin from "firebase-admin"
 import ButtonHelper from "./ButtonHelper"
-import Response from "../models/Response"
+import Vote from "../models/Vote"
 
 export default class DynamicButton {
 	private readonly helper: ButtonHelper
@@ -19,24 +19,24 @@ export default class DynamicButton {
 		const poll = helper.cache.polls.find(poll => poll.value.id === poll_id)
 		if (!poll) return
 
-		const response = helper.cache.responses.find(res =>
+		const vote = helper.cache.votes.find(res =>
 			res.value.poll_id === poll_id &&
 			res.value.user_id === helper.interaction.user.id
 		)
 
-		if (response) {
+		if (vote) {
 			if (poll.value.options.is_multi_choice) {
-				if (response.value.keys.includes(key)) {
+				if (vote.value.keys.includes(key)) {
 					helper.respond("❓ Already voted this option")
 				}
 				else {
 					await helper.cache.ref
-						.collection("responses")
-						.doc(response.value.id)
+						.collection("votes")
+						.doc(vote.value.id)
 						.update({
 							keys: admin.firestore.FieldValue.arrayUnion(key)
 						})
-					helper.respond("✅ Response saved")
+					helper.respond("✅ Vote saved")
 				}
 			}
 			else {
@@ -44,13 +44,13 @@ export default class DynamicButton {
 			}
 		}
 		else {
-			await helper.cache.setResponse(new Response({
-				id: helper.cache.ref.collection("responses").doc().id,
+			await helper.cache.setVote(new Vote({
+				id: helper.cache.ref.collection("votes").doc().id,
 				user_id: helper.interaction.user.id,
 				poll_id,
 				keys: [key]
 			}))
-			helper.respond("✅ Response saved")
+			helper.respond("✅ Vote saved")
 		}
 	}
 
