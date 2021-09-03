@@ -195,6 +195,11 @@ export default class Poll {
 					new MessageActionRow()
 						.addComponents(
 							new MessageButton()
+								.setLabel("Reopen poll")
+								.setStyle("SUCCESS")
+								.setCustomId("reopen-poll")
+								.setEmoji("✅"),
+							new MessageButton()
 								.setLabel("Delete poll")
 								.setStyle("DANGER")
 								.setCustomId("delete-poll")
