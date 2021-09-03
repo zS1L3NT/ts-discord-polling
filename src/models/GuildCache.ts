@@ -103,6 +103,11 @@ export default class GuildCache {
 		}
 		else {
 			console.error("Payload count doesn't match up to poll message id count!")
+			if (payloads.length > pollMessageIds.length) {
+				console.log("Polls > Message IDs")
+			} else {
+				console.log("Message IDs > Polls")
+			}
 		}
 	}
 

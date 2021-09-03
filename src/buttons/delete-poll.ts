@@ -17,7 +17,9 @@ module.exports = {
 
 			promises.push(message.delete())
 			promises.push(serverDoc.collection("polls").doc(poll_id).delete())
-			promises.push(serverDoc.update({ poll_message_ids: admin.firestore.FieldValue.arrayRemove(message.id) }))
+			promises.push(serverDoc.set({
+				poll_message_ids: admin.firestore.FieldValue.arrayRemove(message.id)
+			}, { merge: true }))
 			for (const snap of snaps.docs) {
 				promises.push(serverDoc.collection("votes").doc(snap.id).delete())
 			}

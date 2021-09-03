@@ -1,3 +1,4 @@
+import admin from "firebase-admin"
 import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
 
@@ -27,10 +28,16 @@ module.exports = {
 			return helper.respond(`❌ Existing draft has fewer than 2 choices`)
 		}
 
-		draft.value.author_id = helper.interaction.user.id
-		await helper.cache.ref
+		const doc = helper.cache.ref
 			.collection("polls")
-			.add(draft.value)
+			.doc()
+		draft.value.author_id = helper.interaction.user.id
+		draft.value.id = doc.id
+		await helper.cache.ref
+			.set({
+				poll_message_ids: admin.firestore.FieldValue.arrayUnion("")
+			}, { merge: true })
+		await doc.set(draft.value)
 		delete helper.cache.draft
 		await helper.cache
 			.getDraftDoc()
