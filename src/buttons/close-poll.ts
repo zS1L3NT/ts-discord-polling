@@ -6,7 +6,6 @@ module.exports = {
 	execute: async helper => {
 		const poll_id = helper.interaction.message.embeds[0]!.fields!.find(field => field.name === "ID")!.value
 		const poll = helper.cache.polls.find(poll => poll.value.id === poll_id)!
-
 		const member = helper.interaction.member as GuildMember
 
 		if (
