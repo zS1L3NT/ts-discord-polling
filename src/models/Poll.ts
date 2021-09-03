@@ -12,7 +12,6 @@ export interface iPoll {
 	choices: { [key: string]: string | null }
 	options: {
 		is_closed: boolean
-		is_anonymous: boolean
 		is_multi_choice: boolean
 	}
 }
@@ -41,7 +40,6 @@ export default class Poll {
 			choices: {},
 			options: {
 				is_closed: false,
-				is_anonymous: false,
 				is_multi_choice: false
 			}
 		})
@@ -76,11 +74,6 @@ export default class Poll {
 			embed.addField("Closing Date",
 				new DateHelper(poll.value.date)
 					.getDueDate()
-			)
-			embed.addField("Anonymous",
-				poll.value.options.is_anonymous
-					? "Yes"
-					: "No"
 			)
 			embed.addField("Multi-Choice",
 				poll.value.options.is_multi_choice
