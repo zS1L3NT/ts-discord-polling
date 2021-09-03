@@ -14,7 +14,6 @@ export interface iPoll {
 		is_closed: boolean
 		is_anonymous: boolean
 		is_multi_choice: boolean
-		is_quiz: boolean
 	}
 }
 
@@ -43,8 +42,7 @@ export default class Poll {
 			options: {
 				is_closed: false,
 				is_anonymous: false,
-				is_multi_choice: false,
-				is_quiz: false
+				is_multi_choice: false
 			}
 		})
 	}
@@ -86,11 +84,6 @@ export default class Poll {
 			)
 			embed.addField("Multi-Choice",
 				poll.value.options.is_multi_choice
-					? "Yes"
-					: "No"
-			)
-			embed.addField("Quiz",
-				poll.value.options.is_quiz
 					? "Yes"
 					: "No"
 			)
