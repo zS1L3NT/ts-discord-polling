@@ -146,7 +146,7 @@ export default class Poll {
 						plugins: {
 							legend: false,
 							outlabels: {
-								text: "%l %p",
+								text: "%l • %v • %p",
 								color: "white",
 								stretch: 35,
 								font: {
