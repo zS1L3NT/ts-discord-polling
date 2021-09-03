@@ -50,12 +50,21 @@ export default class BotCache {
 	}
 
 	public async deleteGuildCache(guildId: string) {
+		const promises: Promise<any>[] = []
+
 		const doc = await this.ref.doc(guildId).get()
 		if (doc.exists) {
-			await this.ref.doc(guildId).delete()
+			const doc = this.ref.doc(guildId)
+			;(await doc.collection("polls").get()).forEach(snap => {
+				promises.push(doc.collection("polls").doc(snap.id).delete())
+			})
+			;(await doc.collection("votes").get()).forEach(snap => {
+				promises.push(doc.collection("votes").doc(snap.id).delete())
+			})
+			promises.push(doc.delete())
+
+			await Promise.allSettled(promises)
 		}
 		this.guilds.delete(guildId)
-
-		// Clean up collections if you need to
 	}
 }

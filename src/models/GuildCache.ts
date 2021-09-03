@@ -20,7 +20,7 @@ export default class GuildCache {
 		bot: Client,
 		guild: Guild,
 		ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>,
-		resolve: (localCache: GuildCache) => void
+		resolve: (cache: GuildCache) => void
 	) {
 		this.bot = bot
 		this.guild = guild
