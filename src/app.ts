@@ -53,7 +53,5 @@ bot.on("ready", async () => {
 			const cache = await botCache.getGuildCache(guild)
 			cache.updateMinutely(debugCount).then()
 		}
-
-		console.log("|")
 	})
 })
