@@ -29,7 +29,7 @@ module.exports = {
 		}
 
 		const key = helper.string("key", true)!
-		const value = helper.string("value") ?? ""
+		const value = helper.string("value")
 		draft.value.choices[key] = value
 		await helper.cache.getDraftDoc().set({
 			choices: {
