@@ -121,6 +121,7 @@ export default class Poll {
 
 				const date = new DateHelper(this.value.date)
 				embed.addField("ID", this.value.id)
+				embed.addField("Multi-choice", this.value.options.is_multi_choice ? "Yes" : "No")
 
 				if (!this.value.options.is_closed) {
 					embed.addField("Closing date", date.getDueDate())
