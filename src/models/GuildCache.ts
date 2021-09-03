@@ -106,6 +106,10 @@ export default class GuildCache {
 		}
 	}
 
+	public getDraftDoc() {
+		return this.ref.collection("polls").doc("draft")
+	}
+
 	public getPollChannelId() {
 		return this.document.value.poll_channel_id
 	}

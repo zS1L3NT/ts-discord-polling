@@ -25,7 +25,7 @@ module.exports = {
 		if (response) {
 			for (const key of poll.getKeys()) {
 				if (response.value.keys.includes(key)) {
-					embed.addField(`${Poll.emojis[keys.indexOf(key)]} ${key}`, poll.value.choices[key])
+					embed.addField(`${Poll.emojis[keys.indexOf(key)]} ${key}`, poll.value.choices[key] ?? "*No description*")
 				}
 			}
 		}

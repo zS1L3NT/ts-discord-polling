@@ -1,6 +1,6 @@
-export default class DateFunctions {
+export default class DateHelper {
 	private readonly time: number
-	private readonly days_of_week: {
+	public static days_of_week: {
 		[day: string]: string
 	} = {
 		Mon: "Monday",
@@ -11,7 +11,7 @@ export default class DateFunctions {
 		Sat: "Saturday",
 		Sun: "Sunday"
 	}
-	private readonly name_of_months = [
+	public static name_of_months = [
 		"January",
 		"February",
 		"March",
@@ -25,9 +25,57 @@ export default class DateFunctions {
 		"November",
 		"December"
 	]
+	public static longer_months = [1, 3, 5, 7, 8, 10, 12]
 
 	public constructor(time: number) {
 		this.time = time
+	}
+
+	public static verify(day: number, month: number, year: number, hour: number, minute: number) {
+		const now = new Date()
+
+		if (this.longer_months.includes(month)) {
+			if (day > 31) {
+				throw new Error(`This month cannot have ${day} days`)
+			}
+		} else {
+			if (day > 30) {
+				throw new Error(`This month cannot have ${day} days`)
+			}
+		}
+
+		if (month === 1) {
+			if (year % 4 !== 0 && day === 29) {
+				throw new Error(`February cannot have 29 days in a non-leap year`)
+			}
+			if (day > 29) {
+				throw new Error(`February cannot have ${day} days`)
+			}
+		}
+
+		if (year < now.getFullYear()) {
+			throw new Error("Year must not be in the past")
+		}
+		if (year - now.getFullYear() > 5) {
+			throw new Error("Year must not be more than 5 years ahead")
+		}
+
+		if (hour > 23) {
+			throw new Error("Hour must not exceed 23")
+		}
+
+		if (minute > 59) {
+			throw new Error("Minute must not exceed 59")
+		}
+
+		// Handle timezone change
+		if (new Date().getUTCHours() === new Date().getHours()) {
+			return new Date(
+				new Date(year, month, day, hour, minute).getTime() -
+				28800000
+			)
+		}
+		return new Date(year, month, day, hour, minute)
 	}
 
 	public getDueIn() {
@@ -76,9 +124,9 @@ export default class DateFunctions {
 		}
 
 		const day_of_week =
-			this.days_of_week[localDate.toDateString().slice(0, 3)]
+			DateHelper.days_of_week[localDate.toDateString().slice(0, 3)]
 		const date_in_month = localDate.getDate()
-		const name_of_month = this.name_of_months[localDate.getMonth()]
+		const name_of_month = DateHelper.name_of_months[localDate.getMonth()]
 		const year = localDate.getFullYear()
 
 		const hours = localDate.getHours()
