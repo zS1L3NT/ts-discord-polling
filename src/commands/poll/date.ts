@@ -5,7 +5,7 @@ import DateHelper from "../../utilities/DateHelper"
 module.exports = {
 	data: new SlashCommandSubcommandBuilder()
 		.setName("date")
-		.setDescription("Change the date of a poll")
+		.setDescription("Change the closing date of a poll")
 		.addStringOption(option =>
 			option
 				.setName("poll-id")
@@ -55,7 +55,7 @@ module.exports = {
 			return helper.respond("❌ Poll doesn't exist")
 		}
 
-		const currentDate = new Date(poll.value.date)
+		const date = new Date(poll.value.closing_date)
 
 		const day = helper.integer("day")
 		const month = helper.integer("month")
@@ -64,17 +64,17 @@ module.exports = {
 		const minute = helper.integer("minute")
 
 		if (!day && !month && !year && !hour && !minute) {
-			return helper.respond("❌ You must update at least 1 part of the date")
+			return helper.respond("❌ You must update at least 1 part of the closing date")
 		}
 
-		let date: number
+		let closing_date: number
 		try {
-			date = DateHelper.verify(
-				day ?? currentDate.getDate(),
-				month ?? currentDate.getMonth(),
-				year ?? currentDate.getFullYear(),
-				hour ?? currentDate.getHours(),
-				minute ?? currentDate.getMinutes()
+			closing_date = DateHelper.verify(
+				day ?? date.getDate(),
+				month ?? date.getMonth(),
+				year ?? date.getFullYear(),
+				hour ?? date.getHours(),
+				minute ?? date.getMinutes()
 			).getTime()
 		} catch (err) {
 			return helper.respond(`❌ ${err.message}`)
@@ -84,9 +84,9 @@ module.exports = {
 			.collection("polls")
 			.doc(poll_id)
 			.set({
-				date
+				closing_date
 			}, { merge: true })
 
-		helper.respond("✅ Poll date updated")
+		helper.respond("✅ Poll closing date updated")
 	}
 } as iInteractionSubcommandFile

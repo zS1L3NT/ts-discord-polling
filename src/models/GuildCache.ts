@@ -79,7 +79,7 @@ export default class GuildCache {
 
 		// Remove expired polls
 		for (const poll of this.polls) {
-			if (poll.value.date < Date.now()) {
+			if (poll.value.closing_date < Date.now()) {
 				this.removePoll(poll.value.id).then()
 				const pollMessageIds = this.getPollMessageIds()
 				pollMessageIds.pop()
@@ -88,7 +88,7 @@ export default class GuildCache {
 		}
 
 		const payloads = this.polls
-			.sort((a, b) => b.value.date - a.value.date)
+			.sort((a, b) => b.value.closing_date - a.value.closing_date)
 			.map(poll => poll.getMessagePayload(this))
 
 		const pollMessageIds = this.getPollMessageIds()

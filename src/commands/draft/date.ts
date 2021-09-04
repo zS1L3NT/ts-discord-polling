@@ -6,7 +6,7 @@ import Poll from "../../models/Poll"
 module.exports = {
 	data: new SlashCommandSubcommandBuilder()
 		.setName("date")
-		.setDescription("Change the date of the existing draft")
+		.setDescription("Change the closing date of the existing draft")
 		.addIntegerOption(option =>
 			option
 				.setName("day")
@@ -55,20 +55,20 @@ module.exports = {
 		const hour = helper.integer("hour", true)!
 		const minute = helper.integer("minute", true)!
 
-		let date: number
+		let closing_date: number
 		try {
-			date = DateHelper.verify(day, month, year, hour, minute).getTime()
+			closing_date = DateHelper.verify(day, month, year, hour, minute).getTime()
 		} catch (err) {
 			return helper.respond(`❌ ${err.message}`)
 		}
 
-		draft.value.date = date
+		draft.value.closing_date = closing_date
 		await helper.cache.getDraftDoc().set({
-			date
+			closing_date
 		}, { merge: true })
 
 		helper.respond({
-			content: "✅ Draft date updated",
+			content: "✅ Draft closing date updated",
 			embeds: [Poll.getDraftEmbed(draft, helper.cache)]
 		})
 	}
