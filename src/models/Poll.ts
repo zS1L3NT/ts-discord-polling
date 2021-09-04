@@ -5,7 +5,7 @@ import GuildCache from "./GuildCache"
 
 export interface iPoll {
 	id: string
-	closing_date: number
+	closing_date: number | null
 	author_id: string
 	title: string
 	description: string
@@ -33,7 +33,7 @@ export default class Poll {
 	public static getEmpty(): Poll {
 		return new Poll({
 			id: "",
-			closing_date: 0,
+			closing_date: null,
 			author_id: "",
 			title: "",
 			description: "",
@@ -71,10 +71,13 @@ export default class Poll {
 				}
 			}
 
-			embed.addField("Closing Date",
-				new DateHelper(poll.value.closing_date)
-					.getDueDate()
-			)
+			if (poll.value.closing_date) {
+				embed.addField("Closing Date",
+					new DateHelper(poll.value.closing_date)
+						.getDueDate()
+				)
+			}
+
 			embed.addField("Multi-Choice",
 				poll.value.options.is_multi_choice
 					? "Yes"
@@ -119,13 +122,15 @@ export default class Poll {
 					}
 				}
 
-				const closing_date = new DateHelper(this.value.closing_date)
 				embed.addField("ID", this.value.id)
 				embed.addField("Multi-choice", this.value.options.is_multi_choice ? "Yes" : "No")
 
 				if (!this.value.options.is_closed) {
-					embed.addField("Closing date", closing_date.getDueDate())
-					embed.addField("Closing in", closing_date.getDueIn())
+					if (this.value.closing_date) {
+						const closing_date = new DateHelper(this.value.closing_date)
+						embed.addField("Closing date", closing_date.getDueDate())
+						embed.addField("Closing in", closing_date.getDueIn())
+					}
 				}
 				else {
 					embed.addField("\u200B", "**Closed**")

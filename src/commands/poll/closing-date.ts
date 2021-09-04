@@ -55,29 +55,31 @@ module.exports = {
 			return helper.respond("❌ Poll doesn't exist")
 		}
 
-		const date = new Date(poll.value.closing_date)
-
 		const day = helper.integer("day")
 		const month = helper.integer("month")
 		const year = helper.integer("year")
 		const hour = helper.integer("hour")
 		const minute = helper.integer("minute")
 
+		let closing_date: number | null
 		if (!day && !month && !year && !hour && !minute) {
-			return helper.respond("❌ You must update at least 1 part of the closing date")
+			closing_date = null
 		}
-
-		let closing_date: number
-		try {
-			closing_date = DateHelper.verify(
-				day ?? date.getDate(),
-				month ?? date.getMonth(),
-				year ?? date.getFullYear(),
-				hour ?? date.getHours(),
-				minute ?? date.getMinutes()
-			).getTime()
-		} catch (err) {
-			return helper.respond(`❌ ${err.message}`)
+		else if (!poll.value.closing_date && (!day || !month || !year || !hour || !minute)) {
+			return helper.respond("❌ Set a full closing date before leaving out other date fields!")
+		} else {
+			const date = new Date(poll.value.closing_date ?? 0)
+			try {
+				closing_date = DateHelper.verify(
+					day ?? date.getDate(),
+					month ?? date.getMonth(),
+					year ?? date.getFullYear(),
+					hour ?? date.getHours(),
+					minute ?? date.getMinutes()
+				).getTime()
+			} catch (err) {
+				return helper.respond(`❌ ${err.message}`)
+			}
 		}
 
 		await helper.cache.ref

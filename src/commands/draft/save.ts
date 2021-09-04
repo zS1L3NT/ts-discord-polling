@@ -20,7 +20,7 @@ module.exports = {
 			return helper.respond(`❌ Existing draft description is empty`)
 		}
 
-		if (draft.value.closing_date < Date.now()) {
+		if (draft.value.closing_date && draft.value.closing_date < Date.now()) {
 			return helper.respond(`❌ Existing draft date is invalid, please set it again`)
 		}
 
