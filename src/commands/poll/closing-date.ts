@@ -4,7 +4,7 @@ import DateHelper from "../../utilities/DateHelper"
 
 module.exports = {
 	data: new SlashCommandSubcommandBuilder()
-		.setName("date")
+		.setName("closing-date")
 		.setDescription("Change the closing date of a poll")
 		.addStringOption(option =>
 			option

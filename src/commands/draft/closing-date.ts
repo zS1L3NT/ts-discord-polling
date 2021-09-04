@@ -5,7 +5,7 @@ import Poll from "../../models/Poll"
 
 module.exports = {
 	data: new SlashCommandSubcommandBuilder()
-		.setName("date")
+		.setName("closing-date")
 		.setDescription("Change the closing date of the existing draft")
 		.addIntegerOption(option =>
 			option
