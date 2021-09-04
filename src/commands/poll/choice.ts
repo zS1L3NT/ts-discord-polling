@@ -19,7 +19,7 @@ module.exports = {
 		)
 		.addStringOption(option =>
 			option
-				.setName("value")
+				.setName("description")
 				.setDescription("The new description of the choice")
 				.setRequired(false)
 		),
@@ -35,13 +35,13 @@ module.exports = {
 			return helper.respond("❌ Poll doesn't have a choice with that key")
 		}
 
-		const value = helper.string("value")
+		const description = helper.string("description")
 		await helper.cache.ref
 			.collection("polls")
 			.doc(poll_id)
 			.set({
 				choices: {
-					[key]: value
+					[key]: description
 				}
 			}, { merge: true })
 

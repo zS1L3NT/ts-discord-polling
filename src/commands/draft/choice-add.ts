@@ -14,7 +14,7 @@ module.exports = {
 		)
 		.addStringOption(option =>
 			option
-				.setName("value")
+				.setName("description")
 				.setDescription("The description of the choice. No character limit")
 				.setRequired(false)
 		),
@@ -29,11 +29,11 @@ module.exports = {
 		}
 
 		const key = helper.string("key", true)!
-		const value = helper.string("value")
-		draft.value.choices[key] = value
+		const description = helper.string("description")
+		draft.value.choices[key] = description
 		await helper.cache.getDraftDoc().set({
 			choices: {
-				[key]: value
+				[key]: description
 			}
 		}, { merge: true })
 
