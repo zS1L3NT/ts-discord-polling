@@ -1,6 +1,8 @@
 import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
-import { TextChannel } from "discord.js"
+import { GuildMember, TextChannel } from "discord.js"
+
+const config = require("../../../config.json")
 
 module.exports = {
 	data: new SlashCommandSubcommandBuilder()
@@ -12,6 +14,11 @@ module.exports = {
 				.setDescription("Leave empty to unset the poll channel")
 		),
 	execute: async helper => {
+		const member = helper.interaction.member as GuildMember
+		if (!member.permissions.has("ADMINISTRATOR") && member.id !== config.discord.dev_id) {
+			return helper.respond("❌ Only administrators can set bot channels")
+		}
+
 		const channel = helper.channel("channel")
 		if (channel instanceof TextChannel) {
 			if (channel.id === helper.cache.getPollChannelId()) {
