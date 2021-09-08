@@ -88,7 +88,7 @@ export default class GuildCache {
 		}
 
 		const payloads = this.polls
-			.sort((a, b) => b.value.title > a.value.title ? 1 : -1)
+			.sort((a, b) => b.value.created_date - a.value.created_date)
 			.map(poll => poll.getMessagePayload(this))
 
 		const pollMessageIds = this.getPollMessageIds()

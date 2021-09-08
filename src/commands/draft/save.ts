@@ -32,6 +32,7 @@ module.exports = {
 			.collection("polls")
 			.doc()
 		draft.value.author_id = helper.interaction.user.id
+		draft.value.created_date = Date.now()
 		draft.value.id = doc.id
 		await helper.cache.ref
 			.set({

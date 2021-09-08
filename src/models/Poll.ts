@@ -6,6 +6,7 @@ import GuildCache from "./GuildCache"
 export interface iPoll {
 	id: string
 	closing_date: number | null
+	created_date: number
 	author_id: string
 	title: string
 	description: string
@@ -34,6 +35,7 @@ export default class Poll {
 		return new Poll({
 			id: "",
 			closing_date: null,
+			created_date: 0,
 			author_id: "",
 			title: "",
 			description: "",
@@ -74,7 +76,7 @@ export default class Poll {
 			if (poll.value.closing_date) {
 				embed.addField("Closing Date",
 					new DateHelper(poll.value.closing_date)
-						.getDueDate()
+						.getDate()
 				)
 			}
 
@@ -124,12 +126,13 @@ export default class Poll {
 
 				embed.addField("ID", this.value.id)
 				embed.addField("Multi-choice", this.value.options.is_multi_choice ? "Yes" : "No")
+				embed.addField("Created date", new DateHelper(this.value.created_date).getDate())
 
 				if (!this.value.options.is_closed) {
 					if (this.value.closing_date) {
 						const closing_date = new DateHelper(this.value.closing_date)
-						embed.addField("Closing date", closing_date.getDueDate())
-						embed.addField("Closing in", closing_date.getDueIn())
+						embed.addField("Closing date", closing_date.getDate())
+						embed.addField("Closing in", closing_date.getTimeLeft())
 					}
 				}
 				else {
