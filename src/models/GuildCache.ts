@@ -87,8 +87,15 @@ export default class GuildCache {
 			}
 		}
 
-		const payloads = this.polls
-			.sort((a, b) => b.value.created_date - a.value.created_date)
+		const closedPolls = this.polls
+			.filter(poll => poll.value.options.is_closed)
+			.sort((a, b) => a.value.created_date - b.value.created_date)
+
+		const openPolls = this.polls
+			.filter(poll => !poll.value.options.is_closed)
+			.sort((a, b) => a.value.created_date - b.value.created_date)
+
+		const payloads = [...closedPolls, ...openPolls]
 			.map(poll => poll.getMessagePayload(this))
 
 		const pollMessageIds = this.getPollMessageIds()
