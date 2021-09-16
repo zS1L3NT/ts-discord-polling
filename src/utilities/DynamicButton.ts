@@ -1,4 +1,5 @@
 import admin from "firebase-admin"
+import EmbedResponse, { Emoji } from "./EmbedResponse"
 import ButtonHelper from "./ButtonHelper"
 import Vote from "../models/Vote"
 
@@ -27,7 +28,10 @@ export default class DynamicButton {
 		if (vote) {
 			if (poll.value.options.is_multi_choice) {
 				if (vote.value.keys.includes(key)) {
-					helper.respond("❓ Already voted this option")
+					helper.respond(new EmbedResponse(
+						Emoji.BAD,
+						"Already voted this option"
+					))
 				}
 				else {
 					await helper.cache.ref
@@ -36,11 +40,17 @@ export default class DynamicButton {
 						.update({
 							keys: admin.firestore.FieldValue.arrayUnion(key)
 						})
-					helper.respond("✅ Vote saved")
+					helper.respond(new EmbedResponse(
+						Emoji.GOOD,
+						"Vote saved"
+					))
 				}
 			}
 			else {
-				helper.respond("❌ You already responded to this poll")
+				helper.respond(new EmbedResponse(
+					Emoji.BAD,
+					"You already responded to this poll"
+				))
 			}
 		}
 		else {
@@ -50,7 +60,10 @@ export default class DynamicButton {
 				poll_id,
 				keys: [key]
 			}))
-			helper.respond("✅ Vote saved")
+			helper.respond(new EmbedResponse(
+				Emoji.GOOD,
+				"Vote saved"
+			))
 		}
 	}
 

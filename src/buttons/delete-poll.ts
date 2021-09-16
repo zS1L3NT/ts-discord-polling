@@ -1,6 +1,7 @@
 import admin from "firebase-admin"
 import { iButtonFile } from "../utilities/BotSetupHelper"
 import { GuildMember, Message } from "discord.js"
+import EmbedResponse, { Emoji } from "../utilities/EmbedResponse"
 
 module.exports = {
 	id: "delete-poll",
@@ -26,10 +27,16 @@ module.exports = {
 
 			await Promise.allSettled(promises)
 			helper.cache.updatePollChannel().then()
-			helper.respond("✅ Poll deleted")
+			helper.respond(new EmbedResponse(
+				Emoji.GOOD,
+				"Poll deleted"
+			))
 		}
 		else {
-			helper.respond("❌ Only admins can delete the poll!")
+			helper.respond(new EmbedResponse(
+				Emoji.BAD,
+				"Only admins can delete the poll!"
+			))
 		}
 	}
 } as iButtonFile

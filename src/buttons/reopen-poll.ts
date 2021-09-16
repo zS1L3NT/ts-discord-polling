@@ -1,5 +1,6 @@
 import { iButtonFile } from "../utilities/BotSetupHelper"
 import { GuildMember } from "discord.js"
+import EmbedResponse, { Emoji } from "../utilities/EmbedResponse"
 
 module.exports = {
 	id: "reopen-poll",
@@ -21,10 +22,16 @@ module.exports = {
 					}
 				}, { merge: true })
 			helper.cache.updatePollChannel().then()
-			helper.respond("✅ Poll reopened")
+			helper.respond(new EmbedResponse(
+				Emoji.GOOD,
+				"Poll reopened"
+			))
 		}
 		else {
-			helper.respond("❌ Only the creator of the poll or admins can reopen the poll!")
+			helper.respond(new EmbedResponse(
+				Emoji.BAD,
+				"Only the creator of the poll or admins can reopen the poll!"
+			))
 		}
 	}
 } as iButtonFile

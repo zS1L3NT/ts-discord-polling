@@ -1,5 +1,6 @@
 import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
+import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
 import DateHelper from "../../utilities/DateHelper"
 
 module.exports = {
@@ -52,7 +53,10 @@ module.exports = {
 		const poll_id = helper.string("poll-id", true)!
 		const poll = helper.cache.polls.find(poll => poll.value.id === poll_id)
 		if (!poll) {
-			return helper.respond("❌ Poll doesn't exist")
+			return helper.respond(new EmbedResponse(
+Emoji.BAD,
+"Poll doesn't exist"
+))
 		}
 
 		const day = helper.integer("day")
@@ -66,7 +70,10 @@ module.exports = {
 			closing_date = null
 		}
 		else if (!poll.value.closing_date && (!day || !month || !year || !hour || !minute)) {
-			return helper.respond("❌ Set a full closing date before leaving out other date fields!")
+			return helper.respond(new EmbedResponse(
+Emoji.BAD,
+"Set a full closing date before leaving out other date fields!"
+))
 		} else {
 			const date = new Date(poll.value.closing_date ?? 0)
 			try {
@@ -78,7 +85,10 @@ module.exports = {
 					minute ?? date.getMinutes()
 				).getTime()
 			} catch (err) {
-				return helper.respond(`❌ ${err.message}`)
+				return helper.respond(new EmbedResponse(
+Emoji.BAD,
+`${err.message}`
+))
 			}
 		}
 
@@ -89,6 +99,9 @@ module.exports = {
 				closing_date
 			}, { merge: true })
 
-		helper.respond("✅ Poll closing date updated")
+		helper.respond(new EmbedResponse(
+Emoji.GOOD,
+"Poll closing date updated"
+))
 	}
 } as iInteractionSubcommandFile

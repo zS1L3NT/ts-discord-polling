@@ -1,6 +1,7 @@
 import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
 import { GuildMember, TextChannel } from "discord.js"
+import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
 
 const config = require("../../../config.json")
 
@@ -16,27 +17,41 @@ module.exports = {
 	execute: async helper => {
 		const member = helper.interaction.member as GuildMember
 		if (!member.permissions.has("ADMINISTRATOR") && member.id !== config.discord.dev_id) {
-			return helper.respond("❌ Only administrators can set bot channels")
+			return helper.respond(new EmbedResponse(
+				Emoji.BAD,
+				"Only administrators can set bot channels"
+			))
 		}
 
 		const channel = helper.channel("channel")
 		if (channel instanceof TextChannel) {
 			if (channel.id === helper.cache.getPollChannelId()) {
-				helper.respond(
-					"❌ This channel is already the polls channel!"
-				)
-			} else {
+				helper.respond(new EmbedResponse(
+					Emoji.BAD,
+					"This channel is already the polls channel!"
+				))
+			}
+			else {
 				await helper.cache.setPollChannelId(channel.id)
 				helper.cache.updatePollChannel().then()
-				helper.respond(
-					`✅ Reminders channel reassigned to ${channel.toString()}`
-				)
+				helper.respond(new EmbedResponse(
+					Emoji.GOOD,
+					`Reminders channel reassigned to ${channel.toString()}`
+				))
 			}
-		} else if (channel === null) {
+		}
+		else if (channel === null) {
 			await helper.cache.setPollChannelId("")
-			helper.respond(`✅ Poll channel unassigned`)
-		} else {
-			helper.respond(`❌ Please select a text channel`)
+			helper.respond(new EmbedResponse(
+				Emoji.GOOD,
+				`Poll channel unassigned`
+			))
+		}
+		else {
+			helper.respond(new EmbedResponse(
+				Emoji.BAD,
+				`Please select a text channel`
+			))
 		}
 	}
 } as iInteractionSubcommandFile

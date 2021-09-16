@@ -1,6 +1,7 @@
 import admin from "firebase-admin"
 import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
+import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
 
 module.exports = {
 	data: new SlashCommandSubcommandBuilder()
@@ -15,7 +16,10 @@ module.exports = {
 	execute: async helper => {
 		const draft = helper.cache.draft
 		if (!draft) {
-			return helper.respond("❌ No draft to edit")
+			return helper.respond(new EmbedResponse(
+				Emoji.BAD,
+				"No draft to edit"
+			))
 		}
 
 		const key = helper.string("key", true)!
@@ -28,9 +32,16 @@ module.exports = {
 				}
 			}, { merge: true })
 
-			helper.respond("✅ Choice removed")
-		} else {
-			helper.respond("❌ No choice with that key")
+			helper.respond(new EmbedResponse(
+				Emoji.GOOD,
+				"Choice removed"
+			))
+		}
+		else {
+			helper.respond(new EmbedResponse(
+				Emoji.BAD,
+				"No choice with that key"
+			))
 		}
 	}
 } as iInteractionSubcommandFile

@@ -1,5 +1,6 @@
 import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
+import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
 import Poll from "../../models/Poll"
 
 module.exports = {
@@ -15,7 +16,10 @@ module.exports = {
 	execute: async helper => {
 		const draft = helper.cache.draft
 		if (!draft) {
-			return helper.respond("❌ No draft to edit")
+			return helper.respond(new EmbedResponse(
+				Emoji.BAD,
+				"No draft to edit"
+			))
 		}
 
 		const multi_choice = helper.boolean("multi-choice", true)!
@@ -27,8 +31,10 @@ module.exports = {
 		}, { merge: true })
 
 		helper.respond({
-			content: "✅ Draft updated",
-			embeds: [Poll.getDraftEmbed(draft, helper.cache)]
+			embeds: [
+				new EmbedResponse(Emoji.GOOD, "Draft updated").create(),
+				Poll.getDraftEmbed(draft, helper.cache)
+			]
 		})
 	}
 } as iInteractionSubcommandFile

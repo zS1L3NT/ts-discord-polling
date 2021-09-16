@@ -1,5 +1,6 @@
 import { iButtonFile } from "../utilities/BotSetupHelper"
 import { GuildMember } from "discord.js"
+import EmbedResponse, { Emoji } from "../utilities/EmbedResponse"
 
 module.exports = {
 	id: "close-poll",
@@ -21,10 +22,16 @@ module.exports = {
 					}
 				}, { merge: true })
 			helper.cache.updatePollChannel().then()
-			helper.respond("✅ Poll closed")
+			helper.respond(new EmbedResponse(
+				Emoji.GOOD,
+				"Poll closed"
+			))
 		}
 		else {
-			helper.respond("❌ Only the creator of the poll or admins can close the poll!")
+			helper.respond(new EmbedResponse(
+				Emoji.BAD,
+				"Only the creator of the poll or admins can close the poll!"
+			))
 		}
 	}
 } as iButtonFile

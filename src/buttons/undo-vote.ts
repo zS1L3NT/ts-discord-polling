@@ -1,4 +1,5 @@
 import { iButtonFile } from "../utilities/BotSetupHelper"
+import EmbedResponse, { Emoji } from "../utilities/EmbedResponse"
 
 module.exports = {
 	id: "undo-vote",
@@ -15,9 +16,16 @@ module.exports = {
 				.collection("votes")
 				.doc(vote.value.id)
 				.delete()
-			helper.respond("✅ Vote removed")
-		} else {
-			helper.respond("❌ You didn't respond to this poll")
+			helper.respond(new EmbedResponse(
+				Emoji.GOOD,
+				"Vote removed"
+			))
+		}
+		else {
+			helper.respond(new EmbedResponse(
+				Emoji.BAD,
+				"You didn't respond to this poll"
+			))
 		}
 	}
 } as iButtonFile

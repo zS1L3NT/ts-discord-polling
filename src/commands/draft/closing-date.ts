@@ -1,5 +1,6 @@
 import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
+import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
 import DateHelper from "../../utilities/DateHelper"
 import Poll from "../../models/Poll"
 
@@ -46,7 +47,10 @@ module.exports = {
 	execute: async helper => {
 		const draft = helper.cache.draft
 		if (!draft) {
-			return helper.respond("❌ No draft to edit")
+			return helper.respond(new EmbedResponse(
+				Emoji.BAD,
+				"No draft to edit"
+			))
 		}
 
 		const day = helper.integer("day")
@@ -60,8 +64,12 @@ module.exports = {
 			closing_date = null
 		}
 		else if (!draft.value.closing_date && (!day || !month || !year || !hour || !minute)) {
-			return helper.respond("❌ Set a full closing date before leaving out other date fields!")
-		} else {
+			return helper.respond(new EmbedResponse(
+				Emoji.BAD,
+				"Set a full closing date before leaving out other date fields!"
+			))
+		}
+		else {
 			const date = new Date(draft.value.closing_date ?? 0)
 			try {
 				closing_date = DateHelper.verify(
@@ -72,7 +80,10 @@ module.exports = {
 					minute ?? date.getMinutes()
 				).getTime()
 			} catch (err) {
-				return helper.respond(`❌ ${err.message}`)
+				return helper.respond(new EmbedResponse(
+					Emoji.BAD,
+					`${err.message}`
+				))
 			}
 		}
 
@@ -82,8 +93,10 @@ module.exports = {
 		}, { merge: true })
 
 		helper.respond({
-			content: "✅ Draft closing date updated",
-			embeds: [Poll.getDraftEmbed(draft, helper.cache)]
+			embeds: [
+				new EmbedResponse(Emoji.GOOD, "Draft closing date updated").create(),
+				Poll.getDraftEmbed(draft, helper.cache)
+			]
 		})
 	}
 } as iInteractionSubcommandFile

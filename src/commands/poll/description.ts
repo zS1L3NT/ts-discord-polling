@@ -1,5 +1,6 @@
 import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
+import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
 
 module.exports = {
 	data: new SlashCommandSubcommandBuilder()
@@ -21,7 +22,10 @@ module.exports = {
 		const poll_id = helper.string("poll-id", true)!
 		const poll = helper.cache.polls.find(poll => poll.value.id === poll_id)
 		if (!poll) {
-			return helper.respond("❌ Poll doesn't exist")
+			return helper.respond(new EmbedResponse(
+				Emoji.BAD,
+				"Poll doesn't exist"
+			))
 		}
 
 		const description = helper.string("description", true)!
@@ -32,6 +36,9 @@ module.exports = {
 				description
 			}, { merge: true })
 
-		helper.respond("✅ Poll description updated")
+		helper.respond(new EmbedResponse(
+			Emoji.GOOD,
+			"Poll description updated"
+		))
 	}
 } as iInteractionSubcommandFile

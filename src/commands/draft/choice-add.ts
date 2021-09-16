@@ -1,5 +1,6 @@
 import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
+import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
 import Poll from "../../models/Poll"
 
 module.exports = {
@@ -21,11 +22,17 @@ module.exports = {
 	execute: async helper => {
 		const draft = helper.cache.draft
 		if (!draft) {
-			return helper.respond("❌ No draft to edit")
+			return helper.respond(new EmbedResponse(
+				Emoji.BAD,
+				"No draft to edit"
+			))
 		}
 
 		if (Object.keys(draft.value.choices).length === 5) {
-			return helper.respond("❌ Cannot set more than 5 choices")
+			return helper.respond(new EmbedResponse(
+				Emoji.BAD,
+				"Cannot set more than 5 choices"
+			))
 		}
 
 		const key = helper.string("key", true)!
@@ -38,8 +45,10 @@ module.exports = {
 		}, { merge: true })
 
 		helper.respond({
-			content: "✅ Draft choice added",
-			embeds: [Poll.getDraftEmbed(draft, helper.cache)]
+			embeds: [
+				new EmbedResponse(Emoji.GOOD, "Draft choice added").create(),
+				Poll.getDraftEmbed(draft, helper.cache)
+			]
 		})
 	}
 } as iInteractionSubcommandFile

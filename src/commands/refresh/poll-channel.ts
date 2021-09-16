@@ -1,5 +1,6 @@
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
 import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
+import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
 import { TextChannel } from "discord.js"
 
 module.exports = {
@@ -12,10 +13,16 @@ module.exports = {
 		const channel = helper.cache.guild.channels.cache.get(helper.cache.getPollChannelId())
 		if (channel instanceof TextChannel) {
 			await helper.cache.updatePollChannel()
-			helper.respond("✅ Poll channel refreshed")
+			helper.respond(new EmbedResponse(
+				Emoji.GOOD,
+				"Poll channel refreshed"
+			))
 		}
 		else {
-			helper.respond("❌ No poll channel set")
+			helper.respond(new EmbedResponse(
+				Emoji.BAD,
+				"No poll channel set"
+			))
 		}
 	}
 } as iInteractionSubcommandFile
