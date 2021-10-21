@@ -1,6 +1,9 @@
 import { Client, Collection, Guild } from "discord.js"
 import BotCache from "../models/BotCache"
-import { SlashCommandBuilder, SlashCommandSubcommandBuilder } from "@discordjs/builders"
+import {
+	SlashCommandBuilder,
+	SlashCommandSubcommandBuilder
+} from "@discordjs/builders"
 import InteractionHelper from "./InteractionHelper"
 import MessageHelper from "./MessageHelper"
 import ButtonHelper from "./ButtonHelper"
@@ -12,7 +15,10 @@ import DynamicButton from "./DynamicButton"
 
 export default class BotSetupHelper {
 	public cache: BotCache
-	public interactionFiles: Collection<string, iInteractionFile | iInteractionFolder>
+	public interactionFiles: Collection<
+		string,
+		iInteractionFile | iInteractionFolder
+	>
 	public buttonFiles: Collection<string, iButtonFile>
 	public menuFiles: Collection<string, iMenuFile>
 	private readonly bot: Client
@@ -22,7 +28,10 @@ export default class BotSetupHelper {
 		this.bot = bot
 		this.cache = new BotCache(this.bot)
 		this.messageFiles = []
-		this.interactionFiles = new Collection<string, iInteractionFile | iInteractionFolder>()
+		this.interactionFiles = new Collection<
+			string,
+			iInteractionFile | iInteractionFolder
+		>()
 		this.buttonFiles = new Collection<string, iButtonFile>()
 		this.menuFiles = new Collection<string, iMenuFile>()
 
@@ -40,7 +49,7 @@ export default class BotSetupHelper {
 			try {
 				for (const messageFile of this.messageFiles) {
 					if (messageFile.condition(helper)) {
-						message.react("⌛").then()
+						message.react("⌛").catch(() => {})
 						await messageFile.execute(helper)
 						break
 					}
@@ -146,8 +155,10 @@ export default class BotSetupHelper {
 		try {
 			await deployer.deploy()
 		} catch (err) {
-			// @ts-ignore
-			console.error(`Failed to deploy slash commands for Guild(${guild.name}): ${err.message}`)
+			console.error(
+				// @ts-ignore
+				`Failed to deploy slash commands for Guild(${guild.name}): ${err.message}`
+			)
 		}
 	}
 
@@ -178,8 +189,9 @@ export default class BotSetupHelper {
 		}
 
 		// Slash subcommands
-		for (const interactionFolderName of units
-			.filter(f => !BotSetupHelper.isFile(f))) {
+		for (const interactionFolderName of units.filter(
+			f => !BotSetupHelper.isFile(f)
+		)) {
 			const interactionFileNames = fs.readdirSync(
 				path.join(__dirname, `../commands/${interactionFolderName}`)
 			)
@@ -205,11 +217,14 @@ export default class BotSetupHelper {
 		}
 
 		// Slash commands
-		for (const interactionFileNames of units
-			.filter(f => BotSetupHelper.isFile(f))) {
-			const iInteractionFile =
-				require(`../commands/${interactionFileNames}`) as iInteractionFile
-			this.interactionFiles.set(iInteractionFile.data.name, iInteractionFile)
+		for (const interactionFileNames of units.filter(f =>
+			BotSetupHelper.isFile(f)
+		)) {
+			const iInteractionFile = require(`../commands/${interactionFileNames}`) as iInteractionFile
+			this.interactionFiles.set(
+				iInteractionFile.data.name,
+				iInteractionFile
+			)
 		}
 	}
 
@@ -225,7 +240,8 @@ export default class BotSetupHelper {
 		}
 
 		for (const buttonFileName of fileNames) {
-			const buttonFile = require(`../buttons/${buttonFileName}`) as iButtonFile
+			const buttonFile =
+				require(`../buttons/${buttonFileName}`) as iButtonFile
 			this.buttonFiles.set(buttonFile.id, buttonFile)
 		}
 	}

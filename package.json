@@ -17,10 +17,12 @@
 		"discord-api-types": "^0.22.0",
 		"discord.js": "^13.1.0",
 		"firebase-admin": "^9.11.0",
+		"luxon": "^2.0.2",
 		"quickchart-js": "^1.4.1"
 	},
 	"devDependencies": {
 		"@types/deep-equal": "^1.0.1",
+		"@types/luxon": "^2.0.5",
 		"@types/node": "^16.4.10",
 		"@types/node-fetch": "^2.5.12",
 		"ts-node": "^10.1.0",
