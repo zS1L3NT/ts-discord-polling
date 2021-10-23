@@ -25,7 +25,7 @@ module.exports = {
 				.setRequired(false)
 		),
 	execute: async helper => {
-		const poll_id = helper.string("poll-id", true)!
+		const poll_id = helper.string("poll-id")!
 		const poll = helper.cache.polls.find(poll => poll.value.id === poll_id)
 		if (!poll) {
 			return helper.respond(new EmbedResponse(
@@ -34,7 +34,7 @@ module.exports = {
 			))
 		}
 
-		const key = helper.string("key", true)!
+		const key = helper.string("key")!
 		if (poll.value.choices[key] === undefined) {
 			return helper.respond(new EmbedResponse(
 				Emoji.BAD,

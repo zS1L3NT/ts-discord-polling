@@ -22,7 +22,7 @@ module.exports = {
 			))
 		}
 
-		const multi_choice = helper.boolean("multi-choice", true)!
+		const multi_choice = helper.boolean("multi-choice")!
 		draft.value.options.is_multi_choice = multi_choice
 		await helper.cache.getDraftDoc().set({
 			options: {

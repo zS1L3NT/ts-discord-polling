@@ -4,7 +4,7 @@ import Poll from "../../models/Poll"
 
 module.exports = {
 	data: new SlashCommandSubcommandBuilder()
-		.setName("show")
+		.setName("draft-show")
 		.setDescription("Show the current draft"),
 	execute: async helper => {
 		helper.respond({

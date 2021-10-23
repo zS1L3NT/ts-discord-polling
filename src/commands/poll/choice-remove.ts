@@ -22,7 +22,7 @@ module.exports = {
 			))
 		}
 
-		const key = helper.string("key", true)!
+		const key = helper.string("key")!
 
 		if (draft.value.choices[key] !== undefined) {
 			delete draft.value.choices[key]

@@ -5,7 +5,7 @@ import Poll from "../../models/Poll"
 
 module.exports = {
 	data: new SlashCommandSubcommandBuilder()
-		.setName("create")
+		.setName("draft-create")
 		.setDescription("Create a draft of a poll to make changes to"),
 	execute: async helper => {
 		const draft = helper.cache.draft

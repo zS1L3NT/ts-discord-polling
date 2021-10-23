@@ -5,7 +5,7 @@ import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
 
 module.exports = {
 	data: new SlashCommandSubcommandBuilder()
-		.setName("save")
+		.setName("draft-save")
 		.setDescription("Save the existing draft to a poll"),
 	execute: async helper => {
 		const draft = helper.cache.draft

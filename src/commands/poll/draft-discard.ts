@@ -4,7 +4,7 @@ import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
 
 module.exports = {
 	data: new SlashCommandSubcommandBuilder()
-		.setName("discard")
+		.setName("draft-discard")
 		.setDescription("Discard the existing draft"),
 	execute: async helper => {
 		const draft = helper.cache.draft
@@ -14,7 +14,7 @@ module.exports = {
 				"No draft to discard"
 			))
 		}
-
+		
 		delete helper.cache.draft
 		await helper.cache.getDraftDoc().delete()
 
