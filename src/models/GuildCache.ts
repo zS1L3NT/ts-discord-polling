@@ -1,33 +1,20 @@
-import Document, { iDocument } from "./Document"
-import { Client, Collection, Guild, Message } from "discord.js"
-import ChannelCleaner from "../utilities/ChannelCleaner"
+import Entry from "./Entry"
 import equal from "deep-equal"
-import Poll from "./Poll"
 import FirestoreParser from "../utilities/FirestoreParser"
+import Poll from "./Poll"
 import Vote from "./Vote"
+import { BaseGuildCache, ChannelCleaner } from "discordjs-nova"
+import { useTryAsync } from "no-try"
 
-export default class GuildCache {
-	public bot: Client
-	public guild: Guild
-	public ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>
-	private document: Document = Document.getEmpty()
-
+export default class GuildCache extends BaseGuildCache<Entry, GuildCache> {
 	public polls: Poll[] = []
 	public votes: Vote[] = []
 	public draft: Poll | undefined
 
-	public constructor(
-		bot: Client,
-		guild: Guild,
-		ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>,
-		resolve: (cache: GuildCache) => void
-	) {
-		this.bot = bot
-		this.guild = guild
-		this.ref = ref
+	public resolve(resolve: (cache: GuildCache) => void) {
 		this.ref.onSnapshot(snap => {
 			if (snap.exists) {
-				this.document = new Document(snap.data() as iDocument)
+				this.entry = snap.data() as Entry
 				resolve(this)
 			}
 		})
@@ -42,44 +29,59 @@ export default class GuildCache {
 		})
 	}
 
-	/**
-	 * Method run every minute
-	 */
+	public onConstruct() {}
+
 	public async updateMinutely(debug: number) {
-		console.time(`Updated Channels for Guild(${this.guild.name}) [${debug}]`)
+		console.time(
+			`Updated Channels for Guild(${this.guild.name}) [${debug}]`
+		)
 
 		await this.updatePollChannel()
 
-		console.timeEnd(`Updated Channels for Guild(${this.guild.name}) [${debug}]`)
+		console.timeEnd(
+			`Updated Channels for Guild(${this.guild.name}) [${debug}]`
+		)
 	}
 
 	public async updatePollChannel() {
 		const pollChannelId = this.getPollChannelId()
 		if (pollChannelId === "") return
 
-		let messages: Collection<string, Message> | undefined
-
-		try {
+		const [err, messages] = await useTryAsync(async () => {
 			const pollMessageIds = this.getPollMessageIds()
-			const cleaner = new ChannelCleaner(this, pollChannelId, pollMessageIds)
+			const cleaner = new ChannelCleaner<Entry, GuildCache>(
+				this,
+				pollChannelId,
+				pollMessageIds
+			)
 			await cleaner.clean()
-			messages = cleaner.getMessages()
+			const messages = cleaner.getMessages()
 
 			const newPollMessageIds = cleaner.getMessageIds()
 			if (!equal(newPollMessageIds, pollMessageIds)) {
-				this.setPollMessageIds(newPollMessageIds).then()
+				this.setPollMessageIds(newPollMessageIds)
 			}
-		} catch {
-			console.warn(
-				`Guild(${this.guild.name}) has no Channel(${pollChannelId})`
-			)
-			await this.setPollChannelId("")
-			return
+
+			return messages
+		})
+
+		if (err) {
+			if (err.message === "no-channel") {
+				console.warn(
+					`Guild(${this.guild.name}) has no Channel(${pollChannelId})`
+				)
+				await this.setPollChannelId("")
+				return
+			}
+			throw err
 		}
 
 		// Remove expired polls
 		for (const poll of this.polls) {
-			if (poll.value.closing_date && poll.value.closing_date < Date.now()) {
+			if (
+				poll.value.closing_date &&
+				poll.value.closing_date < Date.now()
+			) {
 				this.removePoll(poll.value.id).then()
 				const pollMessageIds = this.getPollMessageIds()
 				pollMessageIds.pop()
@@ -95,8 +97,9 @@ export default class GuildCache {
 			.filter(poll => !poll.value.options.is_closed)
 			.sort((a, b) => a.value.created_date - b.value.created_date)
 
-		const payloads = [...closedPolls, ...openPolls]
-			.map(poll => poll.getMessagePayload(this))
+		const payloads = [...closedPolls, ...openPolls].map(poll =>
+			poll.getMessagePayload(this)
+		)
 
 		const pollMessageIds = this.getPollMessageIds()
 
@@ -107,9 +110,10 @@ export default class GuildCache {
 				const message = messages.get(messageId)!
 				message.edit(payload).then()
 			}
-		}
-		else {
-			console.error("Payload count doesn't match up to poll message id count!")
+		} else {
+			console.error(
+				"Payload count doesn't match up to poll message id count!"
+			)
 			if (payloads.length > pollMessageIds.length) {
 				console.log("Polls > Message IDs")
 			} else {
@@ -123,20 +127,20 @@ export default class GuildCache {
 	}
 
 	public getPollChannelId() {
-		return this.document.value.poll_channel_id
+		return this.entry.poll_channel_id
 	}
 
 	public async setPollChannelId(poll_channel_id: string) {
-		this.document.value.poll_channel_id = poll_channel_id
+		this.entry.poll_channel_id = poll_channel_id
 		await this.ref.update({ poll_channel_id })
 	}
 
 	public getPollMessageIds() {
-		return this.document.value.poll_message_ids
+		return this.entry.poll_message_ids
 	}
 
 	public async setPollMessageIds(poll_message_ids: string[]) {
-		this.document.value.poll_message_ids = poll_message_ids
+		this.entry.poll_message_ids = poll_message_ids
 		await this.ref.update({ poll_message_ids })
 	}
 
