@@ -1,10 +1,10 @@
 import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
-import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
+import ResponseBuilder, { Emoji } from "../../utilities/ResponseBuilder"
 import Poll from "../../models/Poll"
 
-module.exports = {
-	data: new SlashCommandSubcommandBuilder()
+const file: iInteractionSubcommandFile<Entry, GuildCache> = {
+	builder: new SlashCommandSubcommandBuilder()
 		.setName("description")
 		.setDescription("Change the description of a poll")
 		.addStringOption(option =>
@@ -31,7 +31,7 @@ module.exports = {
 			)
 			if (!poll) {
 				return helper.respond(
-					new EmbedResponse(Emoji.BAD, "Poll doesn't exist")
+					new ResponseBuilder(Emoji.BAD, "Poll doesn't exist")
 				)
 			}
 
@@ -43,13 +43,13 @@ module.exports = {
 			)
 
 			helper.respond(
-				new EmbedResponse(Emoji.GOOD, "Poll description updated")
+				new ResponseBuilder(Emoji.GOOD, "Poll description updated")
 			)
 		} else {
 			const draft = helper.cache.draft
 			if (!draft) {
 				return helper.respond(
-					new EmbedResponse(Emoji.BAD, "No draft to edit")
+					new ResponseBuilder(Emoji.BAD, "No draft to edit")
 				)
 			}
 
@@ -63,7 +63,7 @@ module.exports = {
 
 			helper.respond({
 				embeds: [
-					new EmbedResponse(
+					new ResponseBuilder(
 						Emoji.GOOD,
 						"Draft description updated"
 					).create(),
@@ -72,4 +72,4 @@ module.exports = {
 			})
 		}
 	}
-} as iInteractionSubcommandFile
+}

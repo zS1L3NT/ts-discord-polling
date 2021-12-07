@@ -1,10 +1,10 @@
 import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
-import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
+import ResponseBuilder, { Emoji } from "../../utilities/ResponseBuilder"
 import Poll from "../../models/Poll"
 
-module.exports = {
-	data: new SlashCommandSubcommandBuilder()
+const file: iInteractionSubcommandFile<Entry, GuildCache> = {
+	builder: new SlashCommandSubcommandBuilder()
 		.setName("is-multi-choice")
 		.setDescription("Multi-choice polls let you choose multiple options")
 		.addBooleanOption(option =>
@@ -16,7 +16,7 @@ module.exports = {
 	execute: async helper => {
 		const draft = helper.cache.draft
 		if (!draft) {
-			return helper.respond(new EmbedResponse(
+			return helper.respond(new ResponseBuilder(
 				Emoji.BAD,
 				"No draft to edit"
 			))
@@ -32,9 +32,9 @@ module.exports = {
 
 		helper.respond({
 			embeds: [
-				new EmbedResponse(Emoji.GOOD, "Draft updated").create(),
+				new ResponseBuilder(Emoji.GOOD, "Draft updated").create(),
 				Poll.getDraftEmbed(draft, helper.cache)
 			]
 		})
 	}
-} as iInteractionSubcommandFile
+}

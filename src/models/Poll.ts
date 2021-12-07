@@ -60,7 +60,7 @@ export default class Poll {
 					member.user.displayAvatarURL()
 				)
 			} else {
-				cache.guild.members.fetch(poll.value.author_id).then()
+				cache.guild.members.fetch(poll.value.author_id)
 			}
 
 			embed.addField("Title", poll.value.title || "\u200B")
@@ -122,7 +122,7 @@ export default class Poll {
 							member.user.displayAvatarURL()
 						)
 					} else {
-						cache.guild.members.fetch(this.value.author_id).then()
+						cache.guild.members.fetch(this.value.author_id)
 					}
 
 					embed.setTitle(`__${this.value.title}__`)

@@ -2,8 +2,8 @@ import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
 import Poll from "../../models/Poll"
 
-module.exports = {
-	data: new SlashCommandSubcommandBuilder()
+const file: iInteractionSubcommandFile<Entry, GuildCache> = {
+	builder: new SlashCommandSubcommandBuilder()
 		.setName("draft-show")
 		.setDescription("Show the current draft"),
 	execute: async helper => {
@@ -11,4 +11,4 @@ module.exports = {
 			embeds: [Poll.getDraftEmbed(helper.cache.draft, helper.cache)]
 		})
 	}
-} as iInteractionSubcommandFile
+}

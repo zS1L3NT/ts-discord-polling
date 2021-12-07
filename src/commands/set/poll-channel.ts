@@ -1,12 +1,13 @@
-import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
-import { GuildMember, TextChannel } from "discord.js"
-import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
+import { Emoji, GuildMember, TextChannel } from "discord.js"
+import { iInteractionSubcommandFile, ResponseBuilder } from "discordjs-nova"
+import Entry from "../../models/Entry"
+import GuildCache from "../../models/GuildCache"
 
 const config = require("../../../config.json")
 
-module.exports = {
-	data: new SlashCommandSubcommandBuilder()
+const file: iInteractionSubcommandFile<Entry, GuildCache> = {
+	builder: new SlashCommandSubcommandBuilder()
 		.setName("poll-channel")
 		.setDescription("Set the channel that all the polls show up in")
 		.addChannelOption(option =>
@@ -17,7 +18,7 @@ module.exports = {
 	execute: async helper => {
 		const member = helper.interaction.member as GuildMember
 		if (!member.permissions.has("ADMINISTRATOR") && member.id !== config.discord.dev_id) {
-			return helper.respond(new EmbedResponse(
+			return helper.respond(new ResponseBuilder(
 				Emoji.BAD,
 				"Only administrators can set bot channels"
 			))
@@ -26,15 +27,15 @@ module.exports = {
 		const channel = helper.channel("channel")
 		if (channel instanceof TextChannel) {
 			if (channel.id === helper.cache.getPollChannelId()) {
-				helper.respond(new EmbedResponse(
+				helper.respond(new ResponseBuilder(
 					Emoji.BAD,
 					"This channel is already the polls channel!"
 				))
 			}
 			else {
 				await helper.cache.setPollChannelId(channel.id)
-				helper.cache.updatePollChannel().then()
-				helper.respond(new EmbedResponse(
+				helper.cache.updatePollChannel()
+				helper.respond(new ResponseBuilder(
 					Emoji.GOOD,
 					`Reminders channel reassigned to ${channel.toString()}`
 				))
@@ -42,16 +43,16 @@ module.exports = {
 		}
 		else if (channel === null) {
 			await helper.cache.setPollChannelId("")
-			helper.respond(new EmbedResponse(
+			helper.respond(new ResponseBuilder(
 				Emoji.GOOD,
 				`Poll channel unassigned`
 			))
 		}
 		else {
-			helper.respond(new EmbedResponse(
+			helper.respond(new ResponseBuilder(
 				Emoji.BAD,
 				`Please select a text channel`
 			))
 		}
 	}
-} as iInteractionSubcommandFile
+}

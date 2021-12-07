@@ -82,10 +82,10 @@ export default class GuildCache extends BaseGuildCache<Entry, GuildCache> {
 				poll.value.closing_date &&
 				poll.value.closing_date < Date.now()
 			) {
-				this.removePoll(poll.value.id).then()
+				this.removePoll(poll.value.id)
 				const pollMessageIds = this.getPollMessageIds()
 				pollMessageIds.pop()
-				this.setPollMessageIds(pollMessageIds).then()
+				this.setPollMessageIds(pollMessageIds)
 			}
 		}
 
@@ -108,7 +108,7 @@ export default class GuildCache extends BaseGuildCache<Entry, GuildCache> {
 				const messageId = pollMessageIds[i]
 				const payload = payloads[i]
 				const message = messages.get(messageId)!
-				message.edit(payload).then()
+				message.edit(payload)
 			}
 		} else {
 			console.error(

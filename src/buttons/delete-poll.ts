@@ -1,12 +1,16 @@
 import admin from "firebase-admin"
-import { iButtonFile } from "../utilities/BotSetupHelper"
+import Entry from "../models/Entry"
+import GuildCache from "../models/GuildCache"
+import { Emoji, iButtonFile, ResponseBuilder } from "discordjs-nova"
 import { GuildMember, Message } from "discord.js"
-import EmbedResponse, { Emoji } from "../utilities/EmbedResponse"
 
-module.exports = {
-	id: "delete-poll",
+const file: iButtonFile<Entry, GuildCache> = {
+	defer: true,
+	ephemeral: true,
 	execute: async helper => {
-		const poll_id = helper.interaction.message.embeds[0]!.fields!.find(field => field.name === "ID")!.value
+		const poll_id = helper.interaction.message.embeds[0]!.fields!.find(
+			field => field.name === "ID"
+		)!.value
 		const member = helper.interaction.member as GuildMember
 		const message = helper.interaction.message as Message
 
@@ -14,29 +18,41 @@ module.exports = {
 			const serverDoc = helper.cache.ref
 			const promises: Promise<any>[] = []
 
-			const snaps = await serverDoc.collection("votes").where("poll_id", "==", poll_id).get()
+			const snaps = await serverDoc
+				.collection("votes")
+				.where("poll_id", "==", poll_id)
+				.get()
 
 			promises.push(message.delete())
 			promises.push(serverDoc.collection("polls").doc(poll_id).delete())
-			promises.push(serverDoc.set({
-				poll_message_ids: admin.firestore.FieldValue.arrayRemove(message.id)
-			}, { merge: true }))
+			promises.push(
+				serverDoc.set(
+					{
+						// @ts-ignore
+						poll_message_ids:
+							admin.firestore.FieldValue.arrayRemove(message.id)
+					},
+					{ merge: true }
+				)
+			)
 			for (const snap of snaps.docs) {
-				promises.push(serverDoc.collection("votes").doc(snap.id).delete())
+				promises.push(
+					serverDoc.collection("votes").doc(snap.id).delete()
+				)
 			}
 
 			await Promise.allSettled(promises)
-			helper.cache.updatePollChannel().then()
-			helper.respond(new EmbedResponse(
-				Emoji.GOOD,
-				"Poll deleted"
-			))
-		}
-		else {
-			helper.respond(new EmbedResponse(
-				Emoji.BAD,
-				"Only admins can delete the poll!"
-			))
+			helper.cache.updatePollChannel()
+			helper.respond(new ResponseBuilder(Emoji.GOOD, "Poll deleted"))
+		} else {
+			helper.respond(
+				new ResponseBuilder(
+					Emoji.BAD,
+					"Only admins can delete the poll!"
+				)
+			)
 		}
 	}
-} as iButtonFile
+}
+
+export default file

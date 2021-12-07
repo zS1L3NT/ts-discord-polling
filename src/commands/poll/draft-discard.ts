@@ -1,15 +1,15 @@
 import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
-import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
+import ResponseBuilder, { Emoji } from "../../utilities/ResponseBuilder"
 
-module.exports = {
-	data: new SlashCommandSubcommandBuilder()
+const file: iInteractionSubcommandFile<Entry, GuildCache> = {
+	builder: new SlashCommandSubcommandBuilder()
 		.setName("draft-discard")
 		.setDescription("Discard the existing draft"),
 	execute: async helper => {
 		const draft = helper.cache.draft
 		if (!draft) {
-			return helper.respond(new EmbedResponse(
+			return helper.respond(new ResponseBuilder(
 				Emoji.BAD,
 				"No draft to discard"
 			))
@@ -18,9 +18,9 @@ module.exports = {
 		delete helper.cache.draft
 		await helper.cache.getDraftDoc().delete()
 
-		helper.respond(new EmbedResponse(
+		helper.respond(new ResponseBuilder(
 			Emoji.GOOD,
 			"Draft discarded"
 		))
 	}
-} as iInteractionSubcommandFile
+}

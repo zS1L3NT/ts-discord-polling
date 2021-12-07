@@ -1,10 +1,10 @@
 import admin from "firebase-admin"
 import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
-import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
+import ResponseBuilder, { Emoji } from "../../utilities/ResponseBuilder"
 
-module.exports = {
-	data: new SlashCommandSubcommandBuilder()
+const file: iInteractionSubcommandFile<Entry, GuildCache> = {
+	builder: new SlashCommandSubcommandBuilder()
 		.setName("choice-remove")
 		.setDescription("Remove a choice from the list of choices")
 		.addStringOption(option =>
@@ -16,7 +16,7 @@ module.exports = {
 	execute: async helper => {
 		const draft = helper.cache.draft
 		if (!draft) {
-			return helper.respond(new EmbedResponse(
+			return helper.respond(new ResponseBuilder(
 				Emoji.BAD,
 				"No draft to edit"
 			))
@@ -32,16 +32,16 @@ module.exports = {
 				}
 			}, { merge: true })
 
-			helper.respond(new EmbedResponse(
+			helper.respond(new ResponseBuilder(
 				Emoji.GOOD,
 				"Choice removed"
 			))
 		}
 		else {
-			helper.respond(new EmbedResponse(
+			helper.respond(new ResponseBuilder(
 				Emoji.BAD,
 				"No choice with that key"
 			))
 		}
 	}
-} as iInteractionSubcommandFile
+}

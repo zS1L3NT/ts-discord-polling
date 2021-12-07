@@ -1,9 +1,9 @@
 import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
-import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
+import ResponseBuilder, { Emoji } from "../../utilities/ResponseBuilder"
 
-module.exports = {
-	data: new SlashCommandSubcommandBuilder()
+const file: iInteractionSubcommandFile<Entry, GuildCache> = {
+	builder: new SlashCommandSubcommandBuilder()
 		.setName("choice")
 		.setDescription("Change the description of a choice. Key is unchangeable")
 		.addStringOption(option =>
@@ -28,7 +28,7 @@ module.exports = {
 		const poll_id = helper.string("poll-id")!
 		const poll = helper.cache.polls.find(poll => poll.value.id === poll_id)
 		if (!poll) {
-			return helper.respond(new EmbedResponse(
+			return helper.respond(new ResponseBuilder(
 				Emoji.BAD,
 				"Poll doesn't exist"
 			))
@@ -36,7 +36,7 @@ module.exports = {
 
 		const key = helper.string("key")!
 		if (poll.value.choices[key] === undefined) {
-			return helper.respond(new EmbedResponse(
+			return helper.respond(new ResponseBuilder(
 				Emoji.BAD,
 				"Poll doesn't have a choice with that key"
 			))
@@ -52,9 +52,9 @@ module.exports = {
 				}
 			}, { merge: true })
 
-		helper.respond(new EmbedResponse(
+		helper.respond(new ResponseBuilder(
 			Emoji.GOOD,
 			"Poll choice updated"
 		))
 	}
-} as iInteractionSubcommandFile
+}

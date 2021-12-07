@@ -1,13 +1,13 @@
 import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
 import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
-import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
+import ResponseBuilder, { Emoji } from "../../utilities/ResponseBuilder"
 import DateHelper from "../../utilities/DateHelper"
 import { useTry } from "no-try"
 import { DateTime } from "luxon"
 import Poll from "../../models/Poll"
 
-module.exports = {
-	data: new SlashCommandSubcommandBuilder()
+const file: iInteractionSubcommandFile<Entry, GuildCache> = {
+	builder: new SlashCommandSubcommandBuilder()
 		.setName("closing-date")
 		.setDescription(
 			"Change the closing date of a poll. Leave empty to unset closing date"
@@ -64,7 +64,7 @@ module.exports = {
 			)
 			if (!poll) {
 				return helper.respond(
-					new EmbedResponse(Emoji.BAD, "Poll doesn't exist")
+					new ResponseBuilder(Emoji.BAD, "Poll doesn't exist")
 				)
 			}
 			if (
@@ -72,7 +72,7 @@ module.exports = {
 				(!day || !month || !year || !hour || !minute)
 			) {
 				return helper.respond(
-					new EmbedResponse(
+					new ResponseBuilder(
 						Emoji.BAD,
 						"Set a full closing date before leaving out other date fields!"
 					)
@@ -97,7 +97,7 @@ module.exports = {
 
 			if (err) {
 				return helper.respond(
-					new EmbedResponse(Emoji.BAD, `${err.message}`)
+					new ResponseBuilder(Emoji.BAD, `${err.message}`)
 				)
 			}
 
@@ -107,13 +107,13 @@ module.exports = {
 				.set({ closing_date }, { merge: true })
 
 			helper.respond(
-				new EmbedResponse(Emoji.GOOD, "Poll closing date updated")
+				new ResponseBuilder(Emoji.GOOD, "Poll closing date updated")
 			)
 		} else {
 			const draft = helper.cache.draft
 			if (!draft) {
 				return helper.respond(
-					new EmbedResponse(Emoji.BAD, "No draft to edit")
+					new ResponseBuilder(Emoji.BAD, "No draft to edit")
 				)
 			}
 
@@ -135,7 +135,7 @@ module.exports = {
 
 			if (err) {
 				return helper.respond(
-					new EmbedResponse(Emoji.BAD, `${err.message}`)
+					new ResponseBuilder(Emoji.BAD, `${err.message}`)
 				)
 			}
 
@@ -146,7 +146,7 @@ module.exports = {
 
 			helper.respond({
 				embeds: [
-					new EmbedResponse(
+					new ResponseBuilder(
 						Emoji.GOOD,
 						"Draft closing date updated"
 					).create(),
@@ -155,4 +155,4 @@ module.exports = {
 			})
 		}
 	}
-} as iInteractionSubcommandFile
+}

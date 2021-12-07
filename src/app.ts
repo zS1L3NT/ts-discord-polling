@@ -40,7 +40,7 @@ bot.on("ready", async () => {
 			continue
 		}
 
-		cache.updateMinutely(debugCount).then()
+		cache.updateMinutely(debugCount)
 
 		console.log(`${tag} ✅ Restored cache for Guild(${guild.name})`)
 	}
@@ -51,7 +51,7 @@ bot.on("ready", async () => {
 		debugCount++
 		for (const guild of bot.guilds.cache.toJSON()) {
 			const cache = await botCache.getGuildCache(guild)
-			cache.updateMinutely(debugCount).then()
+			cache.updateMinutely(debugCount)
 		}
 	})
 })
