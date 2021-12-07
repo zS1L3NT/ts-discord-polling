@@ -1,66 +1,115 @@
-import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
-import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
-import ResponseBuilder, { Emoji } from "../../utilities/ResponseBuilder"
-import DateHelper from "../../utilities/DateHelper"
-import { useTry } from "no-try"
-import { DateTime } from "luxon"
+import Entry from "../../models/Entry"
+import GuildCache from "../../models/GuildCache"
 import Poll from "../../models/Poll"
+import {
+	DateHelper,
+	Emoji,
+	iInteractionSubcommandFile,
+	ResponseBuilder
+} from "discordjs-nova"
+import { DateTime } from "luxon"
+import { useTry } from "no-try"
 
 const file: iInteractionSubcommandFile<Entry, GuildCache> = {
-	builder: new SlashCommandSubcommandBuilder()
-		.setName("closing-date")
-		.setDescription(
-			"Change the closing date of a poll. Leave empty to unset closing date"
-		)
-		.addStringOption(option =>
-			option
-				.setName("poll-id")
-				.setDescription(
-					"ID of the poll to edit. If not provided, edits the draft instead"
-				)
-				.setRequired(false)
-		)
-		.addIntegerOption(option =>
-			option
-				.setName("day")
-				.setDescription("Day of the month from 1 - 31")
-				.setRequired(false)
-		)
-		.addIntegerOption(option =>
-			option
-				.setName("month")
-				.setDescription("Month")
-				.setRequired(false)
-				.addChoices(
-					DateHelper.name_of_months.map(name => [
-						name,
-						DateHelper.name_of_months.indexOf(name)
-					])
-				)
-		)
-		.addIntegerOption(option =>
-			option.setName("year").setDescription("Year").setRequired(false)
-		)
-		.addIntegerOption(option =>
-			option
-				.setName("hour")
-				.setDescription("Hour in 24h format from 0 - 23")
-				.setRequired(false)
-		)
-		.addIntegerOption(option =>
-			option.setName("minute").setDescription("Minute").setRequired(false)
-		),
+	defer: true,
+	ephemeral: true,
+	data: {
+		name: "closing-date",
+		description: {
+			slash: "Change the closing date of a Poll",
+			help: [
+				"Change the closing date of a Poll",
+				"You can change specific parts of the closing date"
+			].join("\n")
+		},
+		options: [
+			{
+				name: "poll-id",
+				description: {
+					slash: "ID of the Poll to edit",
+					help: [
+						"This is the ID of the Poll to edit",
+						"Each Poll ID can be found in the Poll itself in the Poll channel"
+					].join("\n")
+				},
+				type: "string",
+				requirements: "Valid Poll ID",
+				required: true
+			},
+			{
+				name: "day",
+				description: {
+					slash: "Day",
+					help: "Day of the month for the Poll"
+				},
+				type: "number",
+				requirements:
+					"Number between 1 ~ 30 or 31, depending on the `month`",
+				required: false,
+				default: "Current value in the Poll"
+			},
+			{
+				name: "month",
+				description: {
+					slash: "Month",
+					help: "Month of the year for the Poll"
+				},
+				type: "number",
+				requirements: "Month",
+				required: false,
+				default: "Current value in the Poll",
+				choices: DateHelper.name_of_months.map(name => ({
+					name,
+					value: DateHelper.name_of_months.indexOf(name)
+				}))
+			},
+			{
+				name: "year",
+				description: {
+					slash: "Year",
+					help: "Year for the Poll"
+				},
+				type: "number",
+				requirements:
+					"Number that isn't more than 5 years more than the current year",
+				required: false,
+				default: "Current value in the Poll"
+			},
+			{
+				name: "hour",
+				description: {
+					slash: "Hour",
+					help: "Hour of the day for the Poll"
+				},
+				type: "number",
+				requirements: "Number between 0 ~ 23",
+				required: false,
+				default: "Current value in the Poll"
+			},
+			{
+				name: "minute",
+				description: {
+					slash: "Minute",
+					help: "Minute of the hour for the Poll"
+				},
+				type: "number",
+				requirements: "Number between 0 ~ 59",
+				required: false,
+				default: "Current value in the Poll"
+			}
+		]
+	},
 	execute: async helper => {
-		const poll_id = helper.string("poll-id")
+		const pollId = helper.string("poll-id")
 		const day = helper.integer("day")
 		const month = helper.integer("month")
 		const year = helper.integer("year")
 		const hour = helper.integer("hour")
 		const minute = helper.integer("minute")
 
-		if (poll_id) {
+		if (pollId) {
 			const poll = helper.cache.polls.find(
-				poll => poll.value.id === poll_id
+				poll => poll.value.id === pollId
 			)
 			if (!poll) {
 				return helper.respond(
@@ -79,12 +128,12 @@ const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 				)
 			}
 
-			const [err, closing_date] = useTry(() => {
+			const [err, closingDate] = useTry(() => {
 				if (!day && !month && !year && !hour && !minute) {
 					return null
 				}
 				const date = DateTime.fromMillis(
-					poll.value.closing_date || 0
+					poll.value.closing_date || Date.now()
 				).setZone("Asia/Singapore")
 				return DateHelper.verify(
 					day ?? date.day,
@@ -103,8 +152,8 @@ const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 
 			await helper.cache.ref
 				.collection("polls")
-				.doc(poll_id)
-				.set({ closing_date }, { merge: true })
+				.doc(pollId)
+				.set({ closing_date: closingDate }, { merge: true })
 
 			helper.respond(
 				new ResponseBuilder(Emoji.GOOD, "Poll closing date updated")
@@ -117,12 +166,12 @@ const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 				)
 			}
 
-			const [err, closing_date] = useTry(() => {
+			const [err, closingDate] = useTry(() => {
 				if (!day && !month && !year && !hour && !minute) {
 					return null
 				}
 				const date = DateTime.fromMillis(
-					draft.value.closing_date || 0
+					draft.value.closing_date || Date.now()
 				).setZone("Asia/Singapore")
 				return DateHelper.verify(
 					day ?? date.day,
@@ -139,20 +188,22 @@ const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 				)
 			}
 
-			draft.value.closing_date = closing_date
+			draft.value.closing_date = closingDate
 			await helper.cache
 				.getDraftDoc()
-				.set({ closing_date }, { merge: true })
+				.set({ closing_date: closingDate }, { merge: true })
 
 			helper.respond({
 				embeds: [
 					new ResponseBuilder(
 						Emoji.GOOD,
 						"Draft closing date updated"
-					).create(),
+					).build(),
 					Poll.getDraftEmbed(draft, helper.cache)
 				]
 			})
 		}
 	}
 }
+
+export default file

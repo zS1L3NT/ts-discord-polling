@@ -6,13 +6,13 @@ const file: iButtonFile<Entry, GuildCache> = {
 	defer: true,
 	ephemeral: true,
 	execute: async helper => {
-		const poll_id = helper.interaction.message.embeds[0]!.fields!.find(
+		const pollId = helper.interaction.message.embeds[0]!.fields!.find(
 			field => field.name === "ID"
 		)!.value
 
 		const vote = helper.cache.votes.find(
 			res =>
-				res.value.poll_id === poll_id &&
+				res.value.poll_id === pollId &&
 				res.value.user_id === helper.interaction.user.id
 		)
 
@@ -26,7 +26,7 @@ const file: iButtonFile<Entry, GuildCache> = {
 			helper.respond(
 				new ResponseBuilder(
 					Emoji.BAD,
-					"You didn't respond to this poll"
+					"You didn't respond to this Poll"
 				)
 			)
 		}

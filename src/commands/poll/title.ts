@@ -1,33 +1,55 @@
-import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
-import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
-import ResponseBuilder, { Emoji } from "../../utilities/ResponseBuilder"
+import Entry from "../../models/Entry"
+import GuildCache from "../../models/GuildCache"
 import Poll from "../../models/Poll"
+import {
+	Emoji,
+	iInteractionSubcommandFile,
+	ResponseBuilder
+} from "discordjs-nova"
 
 const file: iInteractionSubcommandFile<Entry, GuildCache> = {
-	builder: new SlashCommandSubcommandBuilder()
-		.setName("title")
-		.setDescription("Change the title of a poll")
-		.addStringOption(option =>
-			option
-				.setName("title")
-				.setDescription("Title of the poll")
-				.setRequired(true)
-		)
-		.addStringOption(option =>
-			option
-				.setName("poll-id")
-				.setDescription(
-					"ID of the poll to edit. If not provided, edits the draft instead"
-				)
-				.setRequired(false)
-		),
+	defer: true,
+	ephemeral: true,
+	data: {
+		name: "title",
+		description: {
+			slash: "Change the title of a Poll",
+			help: "Change the title of a Poll"
+		},
+		options: [
+			{
+				name: "title",
+				description: {
+					slash: "Title of a Poll",
+					help: "Title of a Poll"
+				},
+				type: "string",
+				requirements: "Text",
+				required: true
+			},
+			{
+				name: "poll-id",
+				description: {
+					slash: "ID of the Poll to edit",
+					help: [
+						"This is the ID of the Poll to edit",
+						"Each Poll ID can be found in the Poll itself in the Poll channel"
+					].join("\n")
+				},
+				type: "string",
+				requirements: "Valid Poll ID",
+				required: false,
+				default: "Draft ID"
+			}
+		]
+	},
 	execute: async helper => {
-		const poll_id = helper.string("poll-id")
+		const pollId = helper.string("poll-id")
 		const title = helper.string("title")!
 
-		if (poll_id) {
+		if (pollId) {
 			const poll = helper.cache.polls.find(
-				poll => poll.value.id === poll_id
+				poll => poll.value.id === pollId
 			)
 			if (!poll) {
 				return helper.respond(
@@ -35,14 +57,16 @@ const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 				)
 			}
 
-			await helper.cache.ref.collection("polls").doc(poll_id).set(
+			await helper.cache.ref.collection("polls").doc(pollId).set(
 				{
 					title
 				},
 				{ merge: true }
 			)
 
-			helper.respond(new ResponseBuilder(Emoji.GOOD, "Poll title updated"))
+			helper.respond(
+				new ResponseBuilder(Emoji.GOOD, "Poll title updated")
+			)
 		} else {
 			const draft = helper.cache.draft
 			if (!draft) {
@@ -64,10 +88,12 @@ const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 					new ResponseBuilder(
 						Emoji.GOOD,
 						"Draft title updated"
-					).create(),
+					).build(),
 					Poll.getDraftEmbed(draft, helper.cache)
 				]
 			})
 		}
 	}
 }
+
+export default file

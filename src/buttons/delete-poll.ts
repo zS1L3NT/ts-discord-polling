@@ -8,7 +8,7 @@ const file: iButtonFile<Entry, GuildCache> = {
 	defer: true,
 	ephemeral: true,
 	execute: async helper => {
-		const poll_id = helper.interaction.message.embeds[0]!.fields!.find(
+		const pollId = helper.interaction.message.embeds[0]!.fields!.find(
 			field => field.name === "ID"
 		)!.value
 		const member = helper.interaction.member as GuildMember
@@ -20,11 +20,11 @@ const file: iButtonFile<Entry, GuildCache> = {
 
 			const snaps = await serverDoc
 				.collection("votes")
-				.where("poll_id", "==", poll_id)
+				.where("poll_id", "==", pollId)
 				.get()
 
 			promises.push(message.delete())
-			promises.push(serverDoc.collection("polls").doc(poll_id).delete())
+			promises.push(serverDoc.collection("polls").doc(pollId).delete())
 			promises.push(
 				serverDoc.set(
 					{
@@ -48,7 +48,7 @@ const file: iButtonFile<Entry, GuildCache> = {
 			helper.respond(
 				new ResponseBuilder(
 					Emoji.BAD,
-					"Only admins can delete the poll!"
+					"Only admins can delete the Poll!"
 				)
 			)
 		}

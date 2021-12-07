@@ -8,15 +8,15 @@ const file: iButtonFile<Entry, GuildCache> = {
 	defer: true,
 	ephemeral: true,
 	execute: async helper => {
-		const poll_id = helper.interaction.message.embeds[0]!.fields!.find(
+		const pollId = helper.interaction.message.embeds[0]!.fields!.find(
 			field => field.name === "ID"
 		)!.value
-		const poll = helper.cache.polls.find(poll => poll.value.id === poll_id)!
-		const keys = poll.getKeys()
+		const poll = helper.cache.polls.find(poll => poll.value.id === pollId)!
+		const names = poll.getNames()
 
 		const vote = helper.cache.votes.find(
 			res =>
-				res.value.poll_id === poll_id &&
+				res.value.poll_id === pollId &&
 				res.value.user_id === helper.interaction.user.id
 		)
 
@@ -29,16 +29,16 @@ const file: iButtonFile<Entry, GuildCache> = {
 			.setDescription(`**${poll.value.description}**\n\u200B`)
 
 		if (vote) {
-			for (const key of poll.getKeys()) {
-				if (vote.value.keys.includes(key)) {
+			for (const name of poll.getNames()) {
+				if (vote.value.names.includes(name)) {
 					embed.addField(
-						`${Poll.emojis[keys.indexOf(key)]} ${key}`,
-						poll.value.choices[key] ?? "*No description*"
+						`${Poll.emojis[names.indexOf(name)]} ${name}`,
+						poll.value.choices[name] ?? "*No description*"
 					)
 				}
 			}
 		} else {
-			embed.description += "\nNo vote"
+			embed.description += "\nNo Vote"
 		}
 
 		helper.respond({

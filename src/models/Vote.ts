@@ -2,7 +2,7 @@ export interface iVote {
 	id: string
 	user_id: string
 	poll_id: string
-	keys: string[]
+	names: string[]
 }
 
 export default class Vote {
@@ -12,12 +12,12 @@ export default class Vote {
 		this.value = value
 	}
 
-	public static getEmpty():Vote {
+	public static getEmpty(): Vote {
 		return new Vote({
 			id: "",
 			user_id: "",
 			poll_id: "",
-			keys: []
+			names: []
 		})
 	}
 }

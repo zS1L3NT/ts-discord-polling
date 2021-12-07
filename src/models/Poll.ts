@@ -5,7 +5,8 @@ import {
 	MessageActionRow,
 	MessageButton,
 	MessageEditOptions,
-	MessageEmbed
+	MessageEmbed,
+	MessageSelectMenu
 } from "discord.js"
 
 export interface iPoll {
@@ -15,7 +16,7 @@ export interface iPoll {
 	author_id: string
 	title: string
 	description: string
-	choices: { [key: string]: string | null }
+	choices: { [name: string]: string | null }
 	options: {
 		is_closed: boolean
 		is_multi_choice: boolean
@@ -70,16 +71,16 @@ export default class Poll {
 			)
 
 			let i = 0
-			for (const key of poll.getKeys()) {
-				const value = poll.value.choices[key]
-				if (++i === poll.getKeys().length) {
+			for (const name of poll.getNames()) {
+				const value = poll.value.choices[name]
+				if (++i === poll.getNames().length) {
 					embed.addField(
-						`${Poll.emojis[i - 1]} ${key}`,
+						`${Poll.emojis[i - 1]} ${name}`,
 						(value ?? "*No description*") + "\n\u200B"
 					)
 				} else {
 					embed.addField(
-						`${Poll.emojis[i - 1]} ${key}`,
+						`${Poll.emojis[i - 1]} ${name}`,
 						value ?? "*No description*"
 					)
 				}
@@ -103,7 +104,7 @@ export default class Poll {
 		return embed
 	}
 
-	public getKeys() {
+	public getNames() {
 		return Object.keys(this.value.choices).sort()
 	}
 
@@ -131,16 +132,16 @@ export default class Poll {
 					)
 
 					let i = 0
-					for (const key of this.getKeys()) {
-						const value = this.value.choices[key]
-						if (++i === this.getKeys().length) {
+					for (const name of this.getNames()) {
+						const value = this.value.choices[name]
+						if (++i === this.getNames().length) {
 							embed.addField(
-								`${Poll.emojis[i - 1]} ${key}`,
+								`${Poll.emojis[i - 1]} ${name}`,
 								(value ?? "*No description*") + "\n\u200B"
 							)
 						} else {
 							embed.addField(
-								`${Poll.emojis[i - 1]} ${key}`,
+								`${Poll.emojis[i - 1]} ${name}`,
 								value ?? "*No description*"
 							)
 						}
@@ -182,7 +183,7 @@ export default class Poll {
 					chart.setConfig({
 						type: "outlabeledPie",
 						data: {
-							labels: this.getKeys(),
+							labels: this.getNames(),
 							datasets: [
 								{
 									backgroundColor: [
@@ -192,10 +193,10 @@ export default class Poll {
 										"#F77825",
 										"#9966FF"
 									],
-									data: this.getKeys().map(
-										key =>
+									data: this.getNames().map(
+										name =>
 											votes.filter(res =>
-												res.value.keys.includes(key)
+												res.value.names.includes(name)
 											).length
 									)
 								}
@@ -225,26 +226,35 @@ export default class Poll {
 			components: !this.value.options.is_closed
 				? [
 						new MessageActionRow().addComponents(
-							this.getKeys().map(key =>
-								new MessageButton()
-									.setLabel(key)
-									.setStyle("PRIMARY")
-									.setCustomId(`${this.value.id}-${key}`)
-							)
+							new MessageSelectMenu()
+								.setCustomId("choice")
+								.setPlaceholder("Vote here")
+								.setMinValues(2)
+								.setMaxValues(5)
+								.setOptions(
+									Object.keys(this.value.options).map(
+										name => ({
+											label: name,
+											description:
+												this.value.choices[name] || "",
+											value: `${this.value.id}-${name}`
+										})
+									)
+								)
 						),
 						new MessageActionRow().addComponents(
 							new MessageButton()
-								.setLabel("Close poll")
+								.setLabel("Close Poll")
 								.setStyle("DANGER")
 								.setCustomId("close-poll")
 								.setEmoji("❎"),
 							new MessageButton()
-								.setLabel("Undo my vote")
+								.setLabel("Undo my Vote")
 								.setStyle("SECONDARY")
 								.setCustomId("undo-vote")
 								.setEmoji("↩️"),
 							new MessageButton()
-								.setLabel("Show my vote")
+								.setLabel("Show my Vote")
 								.setStyle("SUCCESS")
 								.setCustomId("show-vote")
 								.setEmoji("👁️")
@@ -253,12 +263,12 @@ export default class Poll {
 				: [
 						new MessageActionRow().addComponents(
 							new MessageButton()
-								.setLabel("Reopen poll")
+								.setLabel("Reopen Poll")
 								.setStyle("SUCCESS")
 								.setCustomId("reopen-poll")
 								.setEmoji("✅"),
 							new MessageButton()
-								.setLabel("Delete poll")
+								.setLabel("Delete Poll")
 								.setStyle("DANGER")
 								.setCustomId("delete-poll")
 								.setEmoji("🗑️")

@@ -7,10 +7,10 @@ const file: iButtonFile<Entry, GuildCache> = {
 	defer: true,
 	ephemeral: true,
 	execute: async helper => {
-		const poll_id = helper.interaction.message.embeds[0]!.fields!.find(
+		const pollId = helper.interaction.message.embeds[0]!.fields!.find(
 			field => field.name === "ID"
 		)!.value
-		const poll = helper.cache.polls.find(poll => poll.value.id === poll_id)!
+		const poll = helper.cache.polls.find(poll => poll.value.id === pollId)!
 		const member = helper.interaction.member as GuildMember
 
 		if (
@@ -19,7 +19,7 @@ const file: iButtonFile<Entry, GuildCache> = {
 		) {
 			await helper.cache.ref
 				.collection("polls")
-				.doc(poll_id)
+				.doc(pollId)
 				.set(
 					{
 						options: {
@@ -34,7 +34,7 @@ const file: iButtonFile<Entry, GuildCache> = {
 			helper.respond(
 				new ResponseBuilder(
 					Emoji.BAD,
-					"Only the creator of the poll or admins can close the poll!"
+					"Only the creator of the Poll or admins can close the poll!"
 				)
 			)
 		}

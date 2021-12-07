@@ -10,37 +10,35 @@ import {
 const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 	defer: true,
 	ephemeral: true,
-	help: {
-		description: [
-			"Add an option for a poll to choose from.",
-			"You can have a maximum of 5 choices"
-		].join("\n"),
-		params: [
-			{
-				name: "key",
-				description: "",
-				requirements: "",
-				required: true,
-			}
-		]
-	},
-	builder: {
+	data: {
 		name: "choice-add",
-		description: "Add a choice to the list of choices",
+		description: {
+			slash: "Add a choice to the list of choices in the draft",
+			help: [
+				"Add a choice to the list of choices in the draft",
+				"You can have a maximum of 5 choices"
+			].join("\n")
+		},
 		options: [
 			{
+				name: "name",
+				description: {
+					slash: "Name of the choice",
+					help: "This is the main text of the choice and will appear in bigger text"
+				},
 				type: "string",
-				name: "key",
-				description:
-					"The short form / identifying keyword of the choice. Limited to 80 characters",
+				requirements: "Text shorter than 80 characters",
 				required: true
 			},
 			{
+				name: "description",
+				description: {
+					slash: "Description of the choice",
+					help: "This is the secondary text of the choice and will appear below the main text of the choice"
+				},
 				type: "string",
-				name: "string",
-				description:
-					"The description of the choice. No character limit",
-				required: true
+				requirements: "Text",
+				required: false
 			}
 		]
 	},
@@ -58,13 +56,13 @@ const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 			)
 		}
 
-		const key = helper.string("key")!
+		const name = helper.string("name")!
 		const description = helper.string("description")
-		draft.value.choices[key] = description
+		draft.value.choices[name] = description
 		await helper.cache.getDraftDoc().set(
 			{
 				choices: {
-					[key]: description
+					[name]: description
 				}
 			},
 			{ merge: true }
@@ -72,7 +70,7 @@ const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 
 		helper.respond({
 			embeds: [
-				new ResponseBuilder(Emoji.GOOD, "Draft choice added").create(),
+				new ResponseBuilder(Emoji.GOOD, "Draft choice added").build(),
 				Poll.getDraftEmbed(draft, helper.cache)
 			]
 		})

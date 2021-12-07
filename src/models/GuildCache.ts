@@ -19,12 +19,12 @@ export default class GuildCache extends BaseGuildCache<Entry, GuildCache> {
 			}
 		})
 		this.ref.collection("polls").onSnapshot(snaps => {
-			const converter = new FirestoreParser(this, snaps.docs)
+			const converter = new FirestoreParser(snaps.docs)
 			this.polls = converter.getPolls()
 			this.draft = converter.getDraft()
 		})
 		this.ref.collection("votes").onSnapshot(snaps => {
-			const converter = new FirestoreParser(this, snaps.docs)
+			const converter = new FirestoreParser(snaps.docs)
 			this.votes = converter.getVotes()
 		})
 	}
@@ -112,7 +112,7 @@ export default class GuildCache extends BaseGuildCache<Entry, GuildCache> {
 			}
 		} else {
 			console.error(
-				"Payload count doesn't match up to poll message id count!"
+				"Payload count doesn't match up to Poll message id count!"
 			)
 			if (payloads.length > pollMessageIds.length) {
 				console.log("Polls > Message IDs")

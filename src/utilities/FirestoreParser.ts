@@ -1,16 +1,12 @@
-import GuildCache from "../models/GuildCache"
 import Poll, { iPoll } from "../models/Poll"
 import Vote, { iVote } from "../models/Vote"
 
 export default class FirestoreParser {
-	private cache: GuildCache
 	private docs: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>[]
 
 	public constructor(
-		cache: GuildCache,
 		docs: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>[]
 	) {
-		this.cache = cache
 		this.docs = docs
 	}
 
@@ -21,8 +17,7 @@ export default class FirestoreParser {
 	}
 
 	public getVotes(): Vote[] {
-		return this.docs
-			.map(doc => new Vote(doc.data() as iVote))
+		return this.docs.map(doc => new Vote(doc.data() as iVote))
 	}
 
 	public getDraft(): Poll | undefined {
@@ -31,5 +26,4 @@ export default class FirestoreParser {
 			return new Poll(data.data() as iPoll)
 		}
 	}
-
 }
