@@ -1,57 +1,43 @@
-import {Client, Intents} from "discord.js"
-import AfterEvery from "after-every"
-import BotSetupHelper from "./utilities/BotSetupHelper"
+import BotCache from "./models/BotCache"
 import GuildCache from "./models/GuildCache"
+import NovaBot from "discordjs-nova"
+import { Intents } from "discord.js"
 
 const config = require("../config.json")
 
-// region Initialize bot
-const bot = new Client({
-	intents: [Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILDS]
-})
-const botSetupHelper = new BotSetupHelper(bot)
-const {cache: botCache} = botSetupHelper
-// endregion
+new NovaBot({
+	name: "Polling#7976",
+	intents: [Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILDS],
+	cwd: __dirname,
+	config,
+	updatesMinutely: true,
 
-void bot.login(config.discord.token)
-bot.on("ready", async () => {
-	console.log("Logged in as Polling Bot#7976")
+	help: {
+		message: () =>
+			[
+				"Welcome to Polling!",
+				"Polling is a bot that helps create better Polls for your servers",
+				"Built to replace the common way of polling using Discord Reactions",
+				"",
+				"**Make sure to set the poll channel with the **`set polls-channel`** command to see polls in a specific channel**",
+				"Use `poll create` to create a poll",
+				"Use `poll post` to send your poll draft to the Polls",
+				"Have fun exploring Polling!"
+			].join("\n"),
+		icon: "https://cdn.discordapp.com/avatars/881619054044012594/8083c59550893bc0ce63bf524773655c.webp?size=128"
+	},
 
-	let debugCount = 0
+	GuildCache,
+	BotCache,
 
-	let i = 0
-	let count = bot.guilds.cache.size
-	for (const guild of bot.guilds.cache.toJSON()) {
-		const tag = `${(++i).toString().padStart(count.toString().length, "0")}/${count}`
-		let cache: GuildCache | undefined
-		try {
-			cache = await botCache.getGuildCache(guild)
-		} catch (err) {
-			console.error(`${tag} ❌ Couldn't find a Firebase Document for Guild(${guild.name})`)
-			guild.leave()
-			continue
-		}
-
-		try {
-			await botSetupHelper.deploySlashCommands(guild)
-		} catch (err) {
-			console.error(`${tag} ❌ Couldn't get Slash Command permission for Guild(${guild.name})`)
-			guild.leave()
-			continue
-		}
-
-		cache.updateMinutely(debugCount).then()
-
-		console.log(`${tag} ✅ Restored cache for Guild(${guild.name})`)
+	onSetup: botCache => {
+		botCache.bot.user!.setPresence({
+			activities: [
+				{
+					name: "/help",
+					type: "LISTENING"
+				}
+			]
+		})
 	}
-	console.log(`✅ All bot cache restored`)
-	console.log("|")
-
-	AfterEvery(1).minutes(async () => {
-		debugCount++
-		for (const guild of bot.guilds.cache.toJSON()) {
-			const cache = await botCache.getGuildCache(guild)
-			cache.updateMinutely(debugCount).then()
-		}
-	})
 })

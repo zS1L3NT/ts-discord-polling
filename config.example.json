@@ -12,8 +12,8 @@
 			"auth_provider_x509_cert_url": "",
 			"client_x509_cert_url": ""
 		},
-		"database_url": "",
-		"collection": ""
+		"collection": "",
+		"database_url": ""
 	},
 	"discord": {
 		"token": "",

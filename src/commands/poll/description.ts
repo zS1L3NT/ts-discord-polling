@@ -1,41 +1,63 @@
-import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
-import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
-import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
+import Entry from "../../models/Entry"
+import GuildCache from "../../models/GuildCache"
 import Poll from "../../models/Poll"
+import {
+	Emoji,
+	iInteractionSubcommandFile,
+	ResponseBuilder
+} from "discordjs-nova"
 
-module.exports = {
-	data: new SlashCommandSubcommandBuilder()
-		.setName("description")
-		.setDescription("Change the description of a poll")
-		.addStringOption(option =>
-			option
-				.setName("description")
-				.setDescription("Description of the poll")
-				.setRequired(true)
-		)
-		.addStringOption(option =>
-			option
-				.setName("poll-id")
-				.setDescription(
-					"ID of the poll to edit. If not provided, edits the draft instead"
-				)
-				.setRequired(false)
-		),
+const file: iInteractionSubcommandFile<Entry, GuildCache> = {
+	defer: true,
+	ephemeral: true,
+	data: {
+		name: "description",
+		description: {
+			slash: "Change the description of a Poll",
+			help: "Change the description of a Poll"
+		},
+		options: [
+			{
+				name: "description",
+				description: {
+					slash: "Description of the Poll",
+					help: "Description of the Poll"
+				},
+				type: "string",
+				requirements: "Text",
+				required: true
+			},
+			{
+				name: "poll-id",
+				description: {
+					slash: "ID of the Poll to edit",
+					help: [
+						"This is the ID of the Poll to edit",
+						"Each Poll ID can be found in the Poll itself in the Poll channel"
+					].join("\n")
+				},
+				type: "string",
+				requirements: "Valid Poll ID",
+				required: false,
+				default: "Draft ID"
+			}
+		]
+	},
 	execute: async helper => {
-		const poll_id = helper.string("poll-id")
+		const pollId = helper.string("poll-id")
 		const description = helper.string("description")!
 
-		if (poll_id) {
+		if (pollId) {
 			const poll = helper.cache.polls.find(
-				poll => poll.value.id === poll_id
+				poll => poll.value.id === pollId
 			)
 			if (!poll) {
 				return helper.respond(
-					new EmbedResponse(Emoji.BAD, "Poll doesn't exist")
+					new ResponseBuilder(Emoji.BAD, "Poll doesn't exist")
 				)
 			}
 
-			await helper.cache.ref.collection("polls").doc(poll_id).set(
+			await helper.cache.ref.collection("polls").doc(pollId).set(
 				{
 					description
 				},
@@ -43,13 +65,13 @@ module.exports = {
 			)
 
 			helper.respond(
-				new EmbedResponse(Emoji.GOOD, "Poll description updated")
+				new ResponseBuilder(Emoji.GOOD, "Poll description updated")
 			)
 		} else {
 			const draft = helper.cache.draft
 			if (!draft) {
 				return helper.respond(
-					new EmbedResponse(Emoji.BAD, "No draft to edit")
+					new ResponseBuilder(Emoji.BAD, "No draft to edit")
 				)
 			}
 
@@ -63,13 +85,15 @@ module.exports = {
 
 			helper.respond({
 				embeds: [
-					new EmbedResponse(
+					new ResponseBuilder(
 						Emoji.GOOD,
 						"Draft description updated"
-					).create(),
+					).build(),
 					Poll.getDraftEmbed(draft, helper.cache)
 				]
 			})
 		}
 	}
-} as iInteractionSubcommandFile
+}
+
+export default file

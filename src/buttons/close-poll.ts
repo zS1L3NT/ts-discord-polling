@@ -1,12 +1,16 @@
-import { iButtonFile } from "../utilities/BotSetupHelper"
+import Entry from "../models/Entry"
+import GuildCache from "../models/GuildCache"
+import { Emoji, iButtonFile, ResponseBuilder } from "discordjs-nova"
 import { GuildMember } from "discord.js"
-import EmbedResponse, { Emoji } from "../utilities/EmbedResponse"
 
-module.exports = {
-	id: "close-poll",
+const file: iButtonFile<Entry, GuildCache> = {
+	defer: true,
+	ephemeral: true,
 	execute: async helper => {
-		const poll_id = helper.interaction.message.embeds[0]!.fields!.find(field => field.name === "ID")!.value
-		const poll = helper.cache.polls.find(poll => poll.value.id === poll_id)!
+		const pollId = helper.interaction.message.embeds[0]!.fields!.find(
+			field => field.name === "ID"
+		)!.value
+		const poll = helper.cache.polls.find(poll => poll.value.id === pollId)!
 		const member = helper.interaction.member as GuildMember
 
 		if (
@@ -15,23 +19,26 @@ module.exports = {
 		) {
 			await helper.cache.ref
 				.collection("polls")
-				.doc(poll_id)
-				.set({
-					options: {
-						is_closed: true
-					}
-				}, { merge: true })
-			helper.cache.updatePollChannel().then()
-			helper.respond(new EmbedResponse(
-				Emoji.GOOD,
-				"Poll closed"
-			))
-		}
-		else {
-			helper.respond(new EmbedResponse(
-				Emoji.BAD,
-				"Only the creator of the poll or admins can close the poll!"
-			))
+				.doc(pollId)
+				.set(
+					{
+						options: {
+							is_closed: true
+						}
+					},
+					{ merge: true }
+				)
+			helper.cache.updatePollChannel()
+			helper.respond(new ResponseBuilder(Emoji.GOOD, "Poll closed"))
+		} else {
+			helper.respond(
+				new ResponseBuilder(
+					Emoji.BAD,
+					"Only the creator of the Poll or admins can close the poll!"
+				)
+			)
 		}
 	}
-} as iButtonFile
+}
+
+export default file

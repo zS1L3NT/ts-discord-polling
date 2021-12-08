@@ -1,54 +1,80 @@
-import { iInteractionSubcommandFile } from "../../utilities/BotSetupHelper"
-import { SlashCommandSubcommandBuilder } from "@discordjs/builders"
-import EmbedResponse, { Emoji } from "../../utilities/EmbedResponse"
+import Entry from "../../models/Entry"
+import GuildCache from "../../models/GuildCache"
 import Poll from "../../models/Poll"
+import {
+	Emoji,
+	iInteractionSubcommandFile,
+	ResponseBuilder
+} from "discordjs-nova"
 
-module.exports = {
-	data: new SlashCommandSubcommandBuilder()
-		.setName("choice-add")
-		.setDescription("Add a choice to the list of choices")
-		.addStringOption(option =>
-			option
-				.setName("key")
-				.setDescription("The short form / identifying keyword of the choice. Limited to 80 characters")
-				.setRequired(true)
-		)
-		.addStringOption(option =>
-			option
-				.setName("description")
-				.setDescription("The description of the choice. No character limit")
-				.setRequired(false)
-		),
+const file: iInteractionSubcommandFile<Entry, GuildCache> = {
+	defer: true,
+	ephemeral: true,
+	data: {
+		name: "choice-add",
+		description: {
+			slash: "Add a choice to the list of choices in the draft",
+			help: [
+				"Add a choice to the list of choices in the draft",
+				"You can have a maximum of 5 choices"
+			].join("\n")
+		},
+		options: [
+			{
+				name: "name",
+				description: {
+					slash: "Name of the choice",
+					help: "This is the main text of the choice and will appear in bigger text"
+				},
+				type: "string",
+				requirements: "Text shorter than 80 characters",
+				required: true
+			},
+			{
+				name: "description",
+				description: {
+					slash: "Description of the choice",
+					help: "This is the secondary text of the choice and will appear below the main text of the choice"
+				},
+				type: "string",
+				requirements: "Text",
+				required: false
+			}
+		]
+	},
 	execute: async helper => {
 		const draft = helper.cache.draft
 		if (!draft) {
-			return helper.respond(new EmbedResponse(
-				Emoji.BAD,
-				"No draft to edit"
-			))
+			return helper.respond(
+				new ResponseBuilder(Emoji.BAD, "No draft to edit")
+			)
 		}
 
 		if (Object.keys(draft.value.choices).length === 5) {
-			return helper.respond(new EmbedResponse(
-				Emoji.BAD,
-				"Cannot set more than 5 choices"
-			))
+			return helper.respond(
+				new ResponseBuilder(Emoji.BAD, "Cannot set more than 5 choices")
+			)
 		}
 
-		const key = helper.string("key")!
+		const name = helper.string("name")!
 		const description = helper.string("description")
-		draft.value.choices[key] = description
-		await helper.cache.getDraftDoc().set({
-			choices: {
-				[key]: description
-			}
-		}, { merge: true })
+		draft.value.choices[name] = description
+		await helper.cache.getDraftDoc().set(
+			{
+				choices: {
+					[name]: description
+				}
+			},
+			{ merge: true }
+		)
 
 		helper.respond({
 			embeds: [
-				new EmbedResponse(Emoji.GOOD, "Draft choice added").create(),
+				new ResponseBuilder(Emoji.GOOD, "Draft choice added").build(),
 				Poll.getDraftEmbed(draft, helper.cache)
 			]
 		})
 	}
-} as iInteractionSubcommandFile
+}
+
+export default file
