@@ -229,10 +229,8 @@ export default class Poll {
 							new MessageSelectMenu()
 								.setCustomId("choice")
 								.setPlaceholder("Vote here")
-								.setMinValues(2)
-								.setMaxValues(5)
 								.setOptions(
-									Object.keys(this.value.options).map(
+									Object.keys(this.value.choices).map(
 										name => ({
 											label: name,
 											description:
