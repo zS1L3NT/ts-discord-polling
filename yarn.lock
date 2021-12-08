@@ -690,20 +690,6 @@ discord.js@^13.3.1:
     node-fetch "^2.6.1"
     ws "^8.2.3"
 
-discordjs-nova@../ts-npm-discordjs-nova/discordjs-nova-1.0.7.tgz:
-  version "1.0.7"
-  resolved "../ts-npm-discordjs-nova/discordjs-nova-1.0.7.tgz#b3ea057f701a14537a5a9a6bbebe131d234f03cc"
-  dependencies:
-    "@discordjs/builders" "^0.8.2"
-    "@discordjs/rest" "0.1.0-canary.0"
-    after-every "^1.0.4"
-    discord-api-types "0.24.0"
-    discord.js "^13.3.1"
-    firebase-admin "^10.0.0"
-    luxon "^2.1.1"
-    no-try "^3.1.0"
-    node-fetch "^3.1.0"
-
 discordjs-nova@../ts-npm-discordjs-nova/discordjs-nova-1.0.8.tgz:
   version "1.0.8"
   resolved "../ts-npm-discordjs-nova/discordjs-nova-1.0.8.tgz#e1728afb82bbd1990acd0c7a93272b230fd9800a"
