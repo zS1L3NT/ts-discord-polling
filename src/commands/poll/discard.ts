@@ -13,7 +13,7 @@ const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 		name: "discard",
 		description: {
 			slash: "Discard the existing draft",
-			help: "Discard a draft reminder if it exists"
+			help: "Discard a draft Poll if it exists"
 		}
 	},
 	execute: async helper => {

@@ -16,7 +16,7 @@ const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 			slash: "Create a draft of a Poll to make changes to",
 			help: [
 				"Creates a draft for a Peminder that you should make changes to",
-				"Use `reminder show` to see the draft"
+				"Use `poll show` to see the draft"
 			].join("\n")
 		}
 	},

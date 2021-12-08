@@ -64,7 +64,7 @@ const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 				helper.respond(
 					new ResponseBuilder(
 						Emoji.GOOD,
-						`Reminders channel reassigned to ${channel.toString()}`
+						`Polls channel reassigned to ${channel.toString()}`
 					)
 				)
 			}

@@ -21,7 +21,7 @@ new NovaBot({
 				"",
 				"**Make sure to set the poll channel with the **`set polls-channel`** command to see polls in a specific channel**",
 				"Use `poll create` to create a poll",
-				"Use `poll post` to send your poll draft to the reminders",
+				"Use `poll post` to send your poll draft to the Polls",
 				"Have fun exploring Polling!"
 			].join("\n"),
 		icon: "https://cdn.discordapp.com/avatars/881619054044012594/8083c59550893bc0ce63bf524773655c.webp?size=128"
