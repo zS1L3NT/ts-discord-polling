@@ -1,6 +1,6 @@
 import GuildCache from "./GuildCache"
 import QuickChart from "quickchart-js"
-import { DateHelper } from "discordjs-nova"
+import { DateHelper } from "nova-bot"
 import {
 	MessageActionRow,
 	MessageButton,

@@ -4,7 +4,7 @@ import {
 	Emoji,
 	iInteractionSubcommandFile,
 	ResponseBuilder
-} from "discordjs-nova"
+} from "nova-bot"
 import { GuildMember, TextChannel } from "discord.js"
 
 const config = require("../../../config.json")

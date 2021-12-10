@@ -5,7 +5,7 @@ import {
 	Emoji,
 	iInteractionSubcommandFile,
 	ResponseBuilder
-} from "discordjs-nova"
+} from "nova-bot"
 
 const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 	defer: true,

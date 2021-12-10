@@ -6,7 +6,7 @@ import {
 	Emoji,
 	iInteractionSubcommandFile,
 	ResponseBuilder
-} from "discordjs-nova"
+} from "nova-bot"
 import { DateTime } from "luxon"
 import { useTry } from "no-try"
 

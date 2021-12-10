@@ -2,7 +2,7 @@ import Entry from "../models/Entry"
 import GuildCache from "../models/GuildCache"
 import Poll from "../models/Poll"
 import { GuildMember, MessageEmbed } from "discord.js"
-import { iButtonFile } from "discordjs-nova"
+import { iButtonFile } from "nova-bot"
 
 const file: iButtonFile<Entry, GuildCache> = {
 	defer: true,

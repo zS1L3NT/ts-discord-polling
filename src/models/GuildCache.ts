@@ -3,7 +3,7 @@ import equal from "deep-equal"
 import FirestoreParser from "../utilities/FirestoreParser"
 import Poll from "./Poll"
 import Vote from "./Vote"
-import { BaseGuildCache, ChannelCleaner } from "discordjs-nova"
+import { BaseGuildCache, ChannelCleaner } from "nova-bot"
 import { useTryAsync } from "no-try"
 
 export default class GuildCache extends BaseGuildCache<Entry, GuildCache> {

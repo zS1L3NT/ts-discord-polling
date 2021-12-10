@@ -1,6 +1,6 @@
 import Entry from "../models/Entry"
 import GuildCache from "../models/GuildCache"
-import { Emoji, iButtonFile, ResponseBuilder } from "discordjs-nova"
+import { Emoji, iButtonFile, ResponseBuilder } from "nova-bot"
 
 const file: iButtonFile<Entry, GuildCache> = {
 	defer: true,

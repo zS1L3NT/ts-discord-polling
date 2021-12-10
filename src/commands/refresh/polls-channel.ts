@@ -4,7 +4,7 @@ import {
 	Emoji,
 	iInteractionSubcommandFile,
 	ResponseBuilder
-} from "discordjs-nova"
+} from "nova-bot"
 import { TextChannel } from "discord.js"
 
 const file: iInteractionSubcommandFile<Entry, GuildCache> = {

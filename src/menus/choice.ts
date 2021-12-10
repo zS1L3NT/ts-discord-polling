@@ -2,7 +2,7 @@ import admin from "firebase-admin"
 import Entry from "../models/Entry"
 import GuildCache from "../models/GuildCache"
 import Vote from "../models/Vote"
-import { Emoji, iMenuFile, ResponseBuilder } from "discordjs-nova"
+import { Emoji, iMenuFile, ResponseBuilder } from "nova-bot"
 
 const file: iMenuFile<Entry, GuildCache> = {
 	defer: true,
