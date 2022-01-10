@@ -1,6 +1,6 @@
 {
 	"name": "ts-discord-polling",
-	"description": "Polling Bot",
+	"description": "Polling",
 	"main": "dist/app.js",
 	"author": "zS1L3NT",
 	"scripts": {
