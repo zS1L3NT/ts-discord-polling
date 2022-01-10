@@ -1,11 +1,7 @@
 import Entry from "../../models/Entry"
 import GuildCache from "../../models/GuildCache"
 import Poll from "../../models/Poll"
-import {
-	Emoji,
-	iInteractionSubcommandFile,
-	ResponseBuilder
-} from "nova-bot"
+import { Emoji, iInteractionSubcommandFile, ResponseBuilder } from "nova-bot"
 
 const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 	defer: true,

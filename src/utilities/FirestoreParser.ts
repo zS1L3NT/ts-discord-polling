@@ -25,5 +25,6 @@ export default class FirestoreParser {
 		if (data) {
 			return new Poll(data.data() as iPoll)
 		}
+		return undefined
 	}
 }

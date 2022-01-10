@@ -19,7 +19,7 @@ const file: iMenuFile<Entry, GuildCache> = {
 
 		if (vote) {
 			if (poll.value.options.is_multi_choice) {
-				if (vote.value.names.includes(name)) {
+				if (vote.value.names.includes(name!)) {
 					helper.respond(
 						new ResponseBuilder(
 							Emoji.BAD,
@@ -50,8 +50,8 @@ const file: iMenuFile<Entry, GuildCache> = {
 				new Vote({
 					id: helper.cache.ref.collection("votes").doc().id,
 					user_id: helper.interaction.user.id,
-					poll_id: pollId,
-					names: [name]
+					poll_id: pollId!,
+					names: [name!]
 				})
 			)
 			helper.respond(new ResponseBuilder(Emoji.GOOD, "Vote saved"))

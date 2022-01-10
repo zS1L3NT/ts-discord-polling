@@ -105,8 +105,8 @@ export default class GuildCache extends BaseGuildCache<Entry, GuildCache> {
 
 		if (payloads.length === pollMessageIds.length) {
 			for (let i = 0, il = pollMessageIds.length; i < il; i++) {
-				const messageId = pollMessageIds[i]
-				const payload = payloads[i]
+				const messageId = pollMessageIds[i]!
+				const payload = payloads[i]!
 				const message = messages.get(messageId)!
 				message.edit(payload)
 			}
