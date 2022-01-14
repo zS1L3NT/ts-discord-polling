@@ -8,7 +8,8 @@ const file: iMenuFile<Entry, GuildCache> = {
 	defer: true,
 	ephemeral: true,
 	execute: async helper => {
-		const [pollId, name] = helper.value()!.split("-")
+		const [pollId, ...rest] = helper.value()!.split("-")
+		const name = rest.join("-")
 
 		const poll = helper.cache.polls.find(poll => poll.value.id === pollId)!
 		const vote = helper.cache.votes.find(
