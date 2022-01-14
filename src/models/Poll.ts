@@ -20,16 +20,14 @@ export interface iPoll {
 	options: {
 		is_closed: boolean
 		is_multi_choice: boolean
+		is_anonymous: boolean
 	}
 }
 
 export default class Poll {
 	public static emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"]
-	public value: iPoll
 
-	public constructor(value: iPoll) {
-		this.value = value
-	}
+	public constructor(public value: iPoll) {}
 
 	public static getEmpty(): Poll {
 		return new Poll({
@@ -42,12 +40,17 @@ export default class Poll {
 			choices: {},
 			options: {
 				is_closed: false,
-				is_multi_choice: false
+				is_multi_choice: false,
+				is_anonymous: false
 			}
 		})
 	}
 
-	public static getDraftEmbed(
+	public getNames() {
+		return Object.keys(this.value.choices).sort()
+	}
+
+	public static buildDraft(
 		poll: Poll | undefined,
 		cache: GuildCache
 	): MessageEmbed {
@@ -56,10 +59,10 @@ export default class Poll {
 		if (poll) {
 			const member = cache.guild.members.cache.get(poll.value.author_id)
 			if (member) {
-				embed.setAuthor(
-					member.displayName,
-					member.user.displayAvatarURL()
-				)
+				embed.setAuthor({
+					name: member.displayName,
+					iconURL: member.user.displayAvatarURL()
+				})
 			} else {
 				cache.guild.members.fetch(poll.value.author_id)
 			}
@@ -97,6 +100,10 @@ export default class Poll {
 				"Multi-Choice",
 				poll.value.options.is_multi_choice ? "Yes" : "No"
 			)
+			embed.addField(
+				"Anonymous",
+				poll.value.options.is_anonymous ? "Yes" : "No"
+			)
 		} else {
 			embed.setTitle("No draft")
 		}
@@ -104,174 +111,172 @@ export default class Poll {
 		return embed
 	}
 
-	public getNames() {
-		return Object.keys(this.value.choices).sort()
-	}
+	public build(cache: GuildCache): MessageEditOptions {
+		const embed = new MessageEmbed()
+		const member = cache.guild.members.cache.get(this.value.author_id)
+		if (member) {
+			embed.setAuthor({
+				name: member.displayName,
+				iconURL: member.user.displayAvatarURL()
+			})
+		} else {
+			cache.guild.members.fetch(this.value.author_id)
+		}
 
-	public getMessagePayload(cache: GuildCache): MessageEditOptions {
+		embed.setTitle(`__${this.value.title}__`)
+		embed.setDescription(`**${this.value.description}**\n\u200B`)
+
+		let i = 0
+		for (const name of this.getNames()) {
+			const value = this.value.choices[name]
+			if (++i === this.getNames().length) {
+				embed.addField(
+					`${Poll.emojis[i - 1]} ${name}`,
+					(value ?? "*No description*") + "\n\u200B"
+				)
+			} else {
+				embed.addField(
+					`${Poll.emojis[i - 1]} ${name}`,
+					value ?? "*No description*"
+				)
+			}
+		}
+
+		embed.addField("ID", this.value.id)
+		embed.addField(
+			"Multi-choice",
+			this.value.options.is_multi_choice ? "Yes" : "No"
+		)
+		embed.addField(
+			"Anonymous",
+			this.value.options.is_anonymous ? "Yes" : "No"
+		)
+		embed.addField(
+			"Created date",
+			new DateHelper(this.value.created_date).getDate()
+		)
+
+		if (!this.value.options.is_closed) {
+			if (this.value.closing_date) {
+				const closing_date = new DateHelper(this.value.closing_date)
+				embed.addField("Closing date", closing_date.getDate())
+				embed.addField("Closing in", closing_date.getTimeLeft())
+			}
+		} else {
+			embed.addField("\u200B", "**Closed**")
+		}
+
+		const votes = cache.votes.filter(
+			res => res.value.poll_id === this.value.id
+		)
+		const chart = new QuickChart()
+		chart.setBackgroundColor("#2F3136")
+		chart.setConfig({
+			type: "outlabeledPie",
+			data: {
+				labels: this.getNames(),
+				datasets: [
+					{
+						backgroundColor: [
+							"#FF3784",
+							"#36A2EB",
+							"#4BC0C0",
+							"#F77825",
+							"#9966FF"
+						],
+						data: this.getNames().map(
+							name =>
+								votes.filter(res =>
+									res.value.names.includes(name)
+								).length
+						)
+					}
+				]
+			},
+			options: {
+				plugins: {
+					legend: false,
+					outlabels: {
+						text: "%l • %v • %p",
+						color: "white",
+						stretch: 35,
+						font: {
+							resizable: true,
+							minSize: 15,
+							maxSize: 20
+						}
+					}
+				}
+			}
+		})
+		embed.setImage(votes.length > 0 ? chart.getUrl() : "")
+
+		const components = []
+		if (this.value.options.is_closed) {
+			components.push(
+				new MessageActionRow().addComponents(
+					new MessageButton()
+						.setLabel("Reopen Poll")
+						.setStyle("PRIMARY")
+						.setCustomId("reopen-poll")
+						.setEmoji("✅"),
+					new MessageButton()
+						.setLabel("Delete Poll")
+						.setStyle("DANGER")
+						.setCustomId("delete-poll")
+						.setEmoji("🗑️")
+				)
+			)
+		} else {
+			components.push(
+				new MessageActionRow().addComponents(
+					new MessageSelectMenu()
+						.setCustomId("choice")
+						.setPlaceholder("Vote here")
+						.setOptions(
+							Object.keys(this.value.choices).map(name => ({
+								label: name,
+								description: this.value.choices[name] || "",
+								value: `${this.value.id}-${name}`
+							}))
+						)
+				),
+				new MessageActionRow().addComponents(
+					new MessageButton()
+						.setLabel("Close Poll")
+						.setStyle("DANGER")
+						.setCustomId("close-poll")
+						.setEmoji("❎"),
+					new MessageButton()
+						.setLabel("Undo my Vote")
+						.setStyle("SECONDARY")
+						.setCustomId("undo-vote")
+						.setEmoji("↩️"),
+					new MessageButton()
+						.setLabel("Show my Vote")
+						.setStyle("SUCCESS")
+						.setCustomId("show-vote")
+						.setEmoji("👁️")
+				)
+			)
+		}
+
+		if (!this.value.options.is_anonymous) {
+			components.push(
+				new MessageActionRow().addComponents(
+					new MessageButton()
+						.setLabel("Show results")
+						.setStyle("PRIMARY")
+						.setCustomId("show-results")
+						.setEmoji("📊")
+				)
+			)
+		}
+
 		return {
 			content: "\u200B",
-			embeds: [
-				(() => {
-					const embed = new MessageEmbed()
-					const member = cache.guild.members.cache.get(
-						this.value.author_id
-					)
-					if (member) {
-						embed.setAuthor(
-							member.displayName,
-							member.user.displayAvatarURL()
-						)
-					} else {
-						cache.guild.members.fetch(this.value.author_id)
-					}
-
-					embed.setTitle(`__${this.value.title}__`)
-					embed.setDescription(
-						`**${this.value.description}**\n\u200B`
-					)
-
-					let i = 0
-					for (const name of this.getNames()) {
-						const value = this.value.choices[name]
-						if (++i === this.getNames().length) {
-							embed.addField(
-								`${Poll.emojis[i - 1]} ${name}`,
-								(value ?? "*No description*") + "\n\u200B"
-							)
-						} else {
-							embed.addField(
-								`${Poll.emojis[i - 1]} ${name}`,
-								value ?? "*No description*"
-							)
-						}
-					}
-
-					embed.addField("ID", this.value.id)
-					embed.addField(
-						"Multi-choice",
-						this.value.options.is_multi_choice ? "Yes" : "No"
-					)
-					embed.addField(
-						"Created date",
-						new DateHelper(this.value.created_date).getDate()
-					)
-
-					if (!this.value.options.is_closed) {
-						if (this.value.closing_date) {
-							const closing_date = new DateHelper(
-								this.value.closing_date
-							)
-							embed.addField(
-								"Closing date",
-								closing_date.getDate()
-							)
-							embed.addField(
-								"Closing in",
-								closing_date.getTimeLeft()
-							)
-						}
-					} else {
-						embed.addField("\u200B", "**Closed**")
-					}
-
-					const votes = cache.votes.filter(
-						res => res.value.poll_id === this.value.id
-					)
-					const chart = new QuickChart()
-					chart.setBackgroundColor("#2F3136")
-					chart.setConfig({
-						type: "outlabeledPie",
-						data: {
-							labels: this.getNames(),
-							datasets: [
-								{
-									backgroundColor: [
-										"#FF3784",
-										"#36A2EB",
-										"#4BC0C0",
-										"#F77825",
-										"#9966FF"
-									],
-									data: this.getNames().map(
-										name =>
-											votes.filter(res =>
-												res.value.names.includes(name)
-											).length
-									)
-								}
-							]
-						},
-						options: {
-							plugins: {
-								legend: false,
-								outlabels: {
-									text: "%l • %v • %p",
-									color: "white",
-									stretch: 35,
-									font: {
-										resizable: true,
-										minSize: 15,
-										maxSize: 20
-									}
-								}
-							}
-						}
-					})
-					embed.setImage(votes.length > 0 ? chart.getUrl() : "")
-
-					return embed
-				})()
-			],
-			components: !this.value.options.is_closed
-				? [
-						new MessageActionRow().addComponents(
-							new MessageSelectMenu()
-								.setCustomId("choice")
-								.setPlaceholder("Vote here")
-								.setOptions(
-									Object.keys(this.value.choices).map(
-										name => ({
-											label: name,
-											description:
-												this.value.choices[name] || "",
-											value: `${this.value.id}-${name}`
-										})
-									)
-								)
-						),
-						new MessageActionRow().addComponents(
-							new MessageButton()
-								.setLabel("Close Poll")
-								.setStyle("DANGER")
-								.setCustomId("close-poll")
-								.setEmoji("❎"),
-							new MessageButton()
-								.setLabel("Undo my Vote")
-								.setStyle("SECONDARY")
-								.setCustomId("undo-vote")
-								.setEmoji("↩️"),
-							new MessageButton()
-								.setLabel("Show my Vote")
-								.setStyle("SUCCESS")
-								.setCustomId("show-vote")
-								.setEmoji("👁️")
-						)
-				  ]
-				: [
-						new MessageActionRow().addComponents(
-							new MessageButton()
-								.setLabel("Reopen Poll")
-								.setStyle("SUCCESS")
-								.setCustomId("reopen-poll")
-								.setEmoji("✅"),
-							new MessageButton()
-								.setLabel("Delete Poll")
-								.setStyle("DANGER")
-								.setCustomId("delete-poll")
-								.setEmoji("🗑️")
-						)
-				  ]
+			embeds: [embed],
+			components
 		}
 	}
 }

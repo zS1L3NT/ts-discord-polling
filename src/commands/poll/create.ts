@@ -36,7 +36,7 @@ const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 		helper.respond({
 			embeds: [
 				new ResponseBuilder(Emoji.GOOD, `Created draft`).build(),
-				Poll.getDraftEmbed(helper.cache.draft, helper.cache)
+				Poll.buildDraft(helper.cache.draft, helper.cache)
 			]
 		})
 	}

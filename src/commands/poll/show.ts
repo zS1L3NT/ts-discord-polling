@@ -15,7 +15,7 @@ const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 	},
 	execute: async helper => {
 		helper.respond({
-			embeds: [Poll.getDraftEmbed(helper.cache.draft, helper.cache)]
+			embeds: [Poll.buildDraft(helper.cache.draft, helper.cache)]
 		})
 	}
 }

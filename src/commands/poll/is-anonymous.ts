@@ -7,17 +7,17 @@ const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 	defer: true,
 	ephemeral: true,
 	data: {
-		name: "is-multi-choice",
+		name: "is-anonymous",
 		description: {
-			slash: "Changes whether a Poll allows multiple choices",
-			help: "Changes whether a Poll allows users to choose multiple choices"
+			slash: "Changes whether users can see the results of a poll",
+			help: "Changes whether users can see the results of a poll"
 		},
 		options: [
 			{
-				name: "is-multi-choice",
+				name: "is-anonymous",
 				description: {
-					slash: "If the Poll is multi-choice",
-					help: "If the Poll is multi-choice"
+					slash: "If the Poll is anonymous",
+					help: "If the Poll is anonymous"
 				},
 				type: "boolean",
 				requirements: "-",
@@ -33,12 +33,12 @@ const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 			)
 		}
 
-		const multi_choice = helper.boolean("is-multi-choice")!
-		draft.value.options.is_multi_choice = multi_choice
+		const anonymous = helper.boolean("is-anonymous")!
+		draft.value.options.is_anonymous = anonymous
 		await helper.cache.getDraftDoc().set(
 			{
 				options: {
-					is_multi_choice: multi_choice
+					is_anonymous: anonymous
 				}
 			},
 			{ merge: true }

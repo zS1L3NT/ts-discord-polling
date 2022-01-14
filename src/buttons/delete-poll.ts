@@ -1,5 +1,6 @@
 import admin from "firebase-admin"
 import Entry from "../models/Entry"
+import getPoll from "../utilities/getPoll"
 import GuildCache from "../models/GuildCache"
 import { Emoji, iButtonFile, ResponseBuilder } from "nova-bot"
 import { GuildMember, Message } from "discord.js"
@@ -8,9 +9,7 @@ const file: iButtonFile<Entry, GuildCache> = {
 	defer: true,
 	ephemeral: true,
 	execute: async helper => {
-		const pollId = helper.interaction.message.embeds[0]!.fields!.find(
-			field => field.name === "ID"
-		)!.value
+		const poll = getPoll(helper)
 		const member = helper.interaction.member as GuildMember
 		const message = helper.interaction.message as Message
 
@@ -20,11 +19,13 @@ const file: iButtonFile<Entry, GuildCache> = {
 
 			const snaps = await serverDoc
 				.collection("votes")
-				.where("poll_id", "==", pollId)
+				.where("poll_id", "==", poll.value.id)
 				.get()
 
 			promises.push(message.delete())
-			promises.push(serverDoc.collection("polls").doc(pollId).delete())
+			promises.push(
+				serverDoc.collection("polls").doc(poll.value.id).delete()
+			)
 			promises.push(
 				serverDoc.set(
 					{

@@ -2,13 +2,9 @@ import Poll, { iPoll } from "../models/Poll"
 import Vote, { iVote } from "../models/Vote"
 
 export default class FirestoreParser {
-	private docs: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>[]
-
 	public constructor(
-		docs: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>[]
-	) {
-		this.docs = docs
-	}
+		private docs: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>[]
+	) {}
 
 	public getPolls(): Poll[] {
 		return this.docs

@@ -98,7 +98,7 @@ export default class GuildCache extends BaseGuildCache<Entry, GuildCache> {
 			.sort((a, b) => a.value.created_date - b.value.created_date)
 
 		const payloads = [...closedPolls, ...openPolls].map(poll =>
-			poll.getMessagePayload(this)
+			poll.build(this)
 		)
 
 		const pollMessageIds = this.getPollMessageIds()

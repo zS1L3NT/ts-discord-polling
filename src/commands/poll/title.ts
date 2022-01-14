@@ -85,7 +85,7 @@ const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 						Emoji.GOOD,
 						"Draft title updated"
 					).build(),
-					Poll.getDraftEmbed(draft, helper.cache)
+					Poll.buildDraft(draft, helper.cache)
 				]
 			})
 		}

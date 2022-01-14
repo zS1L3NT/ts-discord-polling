@@ -1,4 +1,5 @@
 import Entry from "../models/Entry"
+import getPoll from "../utilities/getPoll"
 import GuildCache from "../models/GuildCache"
 import { Emoji, iButtonFile, ResponseBuilder } from "nova-bot"
 import { GuildMember } from "discord.js"
@@ -7,10 +8,7 @@ const file: iButtonFile<Entry, GuildCache> = {
 	defer: true,
 	ephemeral: true,
 	execute: async helper => {
-		const pollId = helper.interaction.message.embeds[0]!.fields!.find(
-			field => field.name === "ID"
-		)!.value
-		const poll = helper.cache.polls.find(poll => poll.value.id === pollId)!
+		const poll = getPoll(helper)
 		const member = helper.interaction.member as GuildMember
 
 		if (
@@ -19,7 +17,7 @@ const file: iButtonFile<Entry, GuildCache> = {
 		) {
 			await helper.cache.ref
 				.collection("polls")
-				.doc(pollId)
+				.doc(poll.value.id)
 				.set(
 					{
 						options: {

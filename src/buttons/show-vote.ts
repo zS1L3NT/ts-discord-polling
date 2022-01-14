@@ -1,4 +1,5 @@
 import Entry from "../models/Entry"
+import getPoll from "../utilities/getPoll"
 import GuildCache from "../models/GuildCache"
 import Poll from "../models/Poll"
 import { GuildMember, MessageEmbed } from "discord.js"
@@ -8,15 +9,12 @@ const file: iButtonFile<Entry, GuildCache> = {
 	defer: true,
 	ephemeral: true,
 	execute: async helper => {
-		const pollId = helper.interaction.message.embeds[0]!.fields!.find(
-			field => field.name === "ID"
-		)!.value
-		const poll = helper.cache.polls.find(poll => poll.value.id === pollId)!
+		const poll = getPoll(helper)
 		const names = poll.getNames()
 
 		const vote = helper.cache.votes.find(
 			res =>
-				res.value.poll_id === pollId &&
+				res.value.poll_id === poll.value.id &&
 				res.value.user_id === helper.interaction.user.id
 		)
 
@@ -24,7 +22,10 @@ const file: iButtonFile<Entry, GuildCache> = {
 		const user = helper.interaction.user
 
 		const embed = new MessageEmbed()
-			.setAuthor(`${member.displayName}'s vote`, user.displayAvatarURL())
+			.setAuthor({
+				name: `${member.displayName}'s vote`,
+				iconURL: user.displayAvatarURL()
+			})
 			.setTitle(`__${poll.value.title}__`)
 			.setDescription(`**${poll.value.description}**\n\u200B`)
 
