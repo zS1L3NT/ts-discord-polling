@@ -8,13 +8,15 @@
 		"dev": "ts-node --files src/app.ts"
 	},
 	"dependencies": {
+		"colors": "^1.4.0",
 		"deep-equal": "^2.0.5",
 		"discord.js": "^13.6.0",
 		"firebase-admin": "^10.0.2",
 		"luxon": "^2.3.0",
 		"no-try": "^3.1.0",
 		"nova-bot": "^1.0.12",
-		"quickchart-js": "^2.0.3"
+		"quickchart-js": "^2.0.3",
+		"tracer": "^1.1.5"
 	},
 	"devDependencies": {
 		"@types/deep-equal": "^1.0.1",

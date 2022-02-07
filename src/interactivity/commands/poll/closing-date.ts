@@ -1,16 +1,11 @@
-import Entry from "../../models/Entry"
-import GuildCache from "../../models/GuildCache"
-import Poll from "../../models/Poll"
-import {
-	DateHelper,
-	Emoji,
-	iInteractionSubcommandFile,
-	ResponseBuilder
-} from "nova-bot"
+import Entry from "../../../data/Entry"
+import GuildCache from "../../../data/GuildCache"
+import Poll from "../../../data/Poll"
+import { DateHelper, Emoji, iSlashSubFile, ResponseBuilder } from "nova-bot"
 import { DateTime } from "luxon"
 import { useTry } from "no-try"
 
-const file: iInteractionSubcommandFile<Entry, GuildCache> = {
+const file: iSlashSubFile<Entry, GuildCache> = {
 	defer: true,
 	ephemeral: true,
 	data: {
@@ -58,9 +53,9 @@ const file: iInteractionSubcommandFile<Entry, GuildCache> = {
 				requirements: "Month",
 				required: false,
 				default: "Current value in the Poll",
-				choices: DateHelper.name_of_months.map(name => ({
+				choices: DateHelper.nameOfMonths.map(name => ({
 					name,
-					value: DateHelper.name_of_months.indexOf(name)
+					value: DateHelper.nameOfMonths.indexOf(name)
 				}))
 			},
 			{

@@ -1,6 +1,6 @@
 import ButtonHelper from "nova-bot/dist/helpers/ButtonHelper"
-import Entry from "../models/Entry"
-import GuildCache from "../models/GuildCache"
+import Entry from "../data/Entry"
+import GuildCache from "../data/GuildCache"
 
 export default (helper: ButtonHelper<Entry, GuildCache>) =>
 	helper.cache.polls.find(

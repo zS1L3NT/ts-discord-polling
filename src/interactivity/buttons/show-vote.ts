@@ -1,7 +1,7 @@
-import Entry from "../models/Entry"
-import getPoll from "../utilities/getPoll"
-import GuildCache from "../models/GuildCache"
-import Poll from "../models/Poll"
+import Entry from "../../data/Entry"
+import getPoll from "../../utilities/getPoll"
+import GuildCache from "../../data/GuildCache"
+import Poll from "../../data/Poll"
 import { GuildMember, MessageEmbed } from "discord.js"
 import { iButtonFile } from "nova-bot"
 

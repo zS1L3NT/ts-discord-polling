@@ -1,9 +1,9 @@
-import Entry from "../models/Entry"
-import GuildCache from "../models/GuildCache"
-import ResultsBuilder from "../utilities/ResultsBuilder"
-import { iMenuFile } from "nova-bot"
+import Entry from "../../data/Entry"
+import GuildCache from "../../data/GuildCache"
+import ResultsBuilder from "../../utilities/ResultsBuilder"
+import { iSelectMenuFile } from "nova-bot"
 
-const file: iMenuFile<Entry, GuildCache> = {
+const file: iSelectMenuFile<Entry, GuildCache> = {
 	defer: false,
 	ephemeral: true,
 	execute: async helper => {

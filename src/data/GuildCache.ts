@@ -32,15 +32,7 @@ export default class GuildCache extends BaseGuildCache<Entry, GuildCache> {
 	public onConstruct() {}
 
 	public async updateMinutely(debug: number) {
-		console.time(
-			`Updated Channels for Guild(${this.guild.name}) [${debug}]`
-		)
-
 		await this.updatePollChannel()
-
-		console.timeEnd(
-			`Updated Channels for Guild(${this.guild.name}) [${debug}]`
-		)
 	}
 
 	public async updatePollChannel() {

@@ -1,6 +1,6 @@
-import Entry from "../models/Entry"
-import getPoll from "../utilities/getPoll"
-import GuildCache from "../models/GuildCache"
+import Entry from "../../data/Entry"
+import getPoll from "../../utilities/getPoll"
+import GuildCache from "../../data/GuildCache"
 import { Emoji, iButtonFile, ResponseBuilder } from "nova-bot"
 import { GuildMember } from "discord.js"
 
@@ -21,18 +21,18 @@ const file: iButtonFile<Entry, GuildCache> = {
 				.set(
 					{
 						options: {
-							is_closed: false
+							is_closed: true
 						}
 					},
 					{ merge: true }
 				)
 			helper.cache.updatePollChannel()
-			helper.respond(new ResponseBuilder(Emoji.GOOD, "Poll reopened"))
+			helper.respond(new ResponseBuilder(Emoji.GOOD, "Poll closed"))
 		} else {
 			helper.respond(
 				new ResponseBuilder(
 					Emoji.BAD,
-					"Only the creator of the Poll or admins can reopen the Poll!"
+					"Only the creator of the Poll or admins can close the poll!"
 				)
 			)
 		}

@@ -1,5 +1,5 @@
-import Poll, { iPoll } from "../models/Poll"
-import Vote, { iVote } from "../models/Vote"
+import Poll, { iPoll } from "../data/Poll"
+import Vote, { iVote } from "../data/Vote"
 
 export default class FirestoreParser {
 	public constructor(

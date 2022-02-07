@@ -1,6 +1,6 @@
-import Entry from "../models/Entry"
-import getPoll from "../utilities/getPoll"
-import GuildCache from "../models/GuildCache"
+import Entry from "../../data/Entry"
+import getPoll from "../../utilities/getPoll"
+import GuildCache from "../../data/GuildCache"
 import { Emoji, iButtonFile, ResponseBuilder } from "nova-bot"
 
 const file: iButtonFile<Entry, GuildCache> = {

@@ -1,5 +1,5 @@
-import Poll from "../models/Poll"
-import Vote from "../models/Vote"
+import Poll from "../data/Poll"
+import Vote from "../data/Vote"
 import {
 	MessageActionRow,
 	MessageEmbed,

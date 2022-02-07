@@ -1,10 +1,10 @@
 import admin from "firebase-admin"
-import Entry from "../models/Entry"
-import GuildCache from "../models/GuildCache"
-import Vote from "../models/Vote"
-import { Emoji, iMenuFile, ResponseBuilder } from "nova-bot"
+import Entry from "../../data/Entry"
+import GuildCache from "../../data/GuildCache"
+import Vote from "../../data/Vote"
+import { Emoji, iSelectMenuFile, ResponseBuilder } from "nova-bot"
 
-const file: iMenuFile<Entry, GuildCache> = {
+const file: iSelectMenuFile<Entry, GuildCache> = {
 	defer: true,
 	ephemeral: true,
 	execute: async helper => {

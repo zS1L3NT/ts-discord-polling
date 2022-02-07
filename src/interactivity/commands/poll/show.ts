@@ -1,9 +1,9 @@
-import Entry from "../../models/Entry"
-import GuildCache from "../../models/GuildCache"
-import Poll from "../../models/Poll"
-import { iInteractionSubcommandFile } from "nova-bot"
+import Entry from "../../../data/Entry"
+import GuildCache from "../../../data/GuildCache"
+import Poll from "../../../data/Poll"
+import { iSlashSubFile } from "nova-bot"
 
-const file: iInteractionSubcommandFile<Entry, GuildCache> = {
+const file: iSlashSubFile<Entry, GuildCache> = {
 	defer: true,
 	ephemeral: true,
 	data: {

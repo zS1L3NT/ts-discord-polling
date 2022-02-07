@@ -1,7 +1,7 @@
-import Entry from "../models/Entry"
-import getPoll from "../utilities/getPoll"
-import GuildCache from "../models/GuildCache"
-import ResultsBuilder from "../utilities/ResultsBuilder"
+import Entry from "../../data/Entry"
+import getPoll from "../../utilities/getPoll"
+import GuildCache from "../../data/GuildCache"
+import ResultsBuilder from "../../utilities/ResultsBuilder"
 import { iButtonFile } from "nova-bot"
 
 const file: iButtonFile<Entry, GuildCache> = {
@@ -13,9 +13,7 @@ const file: iButtonFile<Entry, GuildCache> = {
 			v => v.value.poll_id === poll.value.id
 		)
 
-		helper.respond(
-			new ResultsBuilder(poll, votes).build()
-		)
+		helper.respond(new ResultsBuilder(poll, votes).build())
 	}
 }
 

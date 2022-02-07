@@ -1,15 +1,57 @@
-import BotCache from "./models/BotCache"
+import BotCache from "./data/BotCache"
+import colors from "colors"
 import config from "./config.json"
-import GuildCache from "./models/GuildCache"
+import GuildCache from "./data/GuildCache"
 import NovaBot from "nova-bot"
+import Tracer from "tracer"
 import { Intents } from "discord.js"
+
+global.logger = Tracer.colorConsole({
+	level: process.env.LOG_LEVEL || "log",
+	format: [
+		"[{{timestamp}}] <{{path}}> {{message}}",
+		{
+			//@ts-ignore
+			alert: "[{{timestamp}}] <{{path}}, Line {{line}}> {{message}}",
+			warn: "[{{timestamp}}] <{{path}}, Line {{line}}> {{message}}",
+			error: "[{{timestamp}}] <{{path}}, Line {{line}} at {{pos}}> {{message}}"
+		}
+	],
+	methods: ["log", "discord", "debug", "info", "alert", "warn", "error"],
+	dateformat: "dd mmm yyyy, hh:MM:sstt",
+	filters: {
+		log: colors.grey,
+		//@ts-ignore
+		discord: colors.cyan,
+		debug: colors.blue,
+		info: colors.green,
+		//@ts-ignore
+		alert: colors.yellow,
+		warn: colors.yellow.bold.italic,
+		error: colors.red.bold.italic
+	},
+	preprocess: data => {
+		data.path = data.path
+			.split("nova-bot")
+			.at(-1)!
+			.replace(/^(\/|\\)dist/, "nova-bot")
+			.replaceAll("\\", "/")
+		data.path = data.path
+			.split("ts-discord-polling")
+			.at(-1)!
+			.replace(/^(\/|\\)(dist|src)/, "src")
+			.replaceAll("\\", "/")
+	}
+})
 
 new NovaBot({
 	name: "Polling#7976",
 	intents: [Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILDS],
-	cwd: __dirname,
+	directory: __dirname,
 	config,
 	updatesMinutely: true,
+	//@ts-ignore
+	logger: global.logger,
 
 	help: {
 		message: () =>
