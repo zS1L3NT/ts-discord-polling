@@ -9,18 +9,16 @@
 	},
 	"dependencies": {
 		"deep-equal": "^2.0.5",
-		"discord.js": "^13.5.1",
-		"firebase-admin": "^10.0.1",
+		"discord.js": "^13.6.0",
+		"firebase-admin": "^10.0.2",
 		"luxon": "^2.3.0",
 		"no-try": "^3.1.0",
-		"nova-bot": "^1.0.6",
+		"nova-bot": "^1.0.12",
 		"quickchart-js": "^2.0.3"
 	},
 	"devDependencies": {
 		"@types/deep-equal": "^1.0.1",
 		"@types/luxon": "^2.0.9",
-		"@types/node": "^17.0.8",
-		"ts-node": "^10.4.0",
-		"typescript": "^4.5.4"
+		"typescript": "^4.5.5"
 	}
 }
