@@ -39,6 +39,8 @@ Because of this, I wanted to fix this issue, hence Polling Bot was created.
 
 ## Usage
 
+Copy the `config.example.json` file to `config.json` then fill in the json file with the correct project credentials.
+
 With `yarn`
 
 ```
